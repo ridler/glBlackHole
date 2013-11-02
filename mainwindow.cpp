@@ -4,7 +4,7 @@ MainWindow::MainWindow(QWidget* parent)
     :  QWidget(parent)
 {
    //  Set window title
-   setWindowTitle(tr("Qt OpenGL Lorenz Viewer"));
+   setWindowTitle(tr("Black Hole Simulation"));
 
    //  Create new Lorenz widget
    ViewPort* galaxy = new ViewPort;
@@ -45,14 +45,14 @@ MainWindow::MainWindow(QWidget* parent)
 //   //  Connect combo box to setPAR in myself
 //   connect(preset , SIGNAL(currentIndexChanged(const QString&)), this , SLOT(setPAR(const QString&)));
 
-//   //  Set layout of child widgets
-//   QGridLayout* layout = new QGridLayout;
-//   layout->setColumnStretch(0,100);
-//   layout->setColumnMinimumWidth(0,100);
-//   layout->setRowStretch(4,100);
+   //  Set layout of child widgets
+   QGridLayout* layout = new QGridLayout;
+   layout->setColumnStretch(0,100);
+   layout->setColumnMinimumWidth(0,100);
+   layout->setRowStretch(4,100);
 
-//   //  Lorenz widget
-//   layout->addWidget(lorenz,0,0,5,1);
+   //  Lorenz widget
+   layout->addWidget(galaxy,0,0,5,1);
 
 //   //  Group SBR parameters
 //   QGroupBox* sbrbox = new QGroupBox("Lorenz Parameters");
@@ -84,8 +84,8 @@ MainWindow::MainWindow(QWidget* parent)
 //   //  Preset Values
 //   layout->addWidget(preset,3,1);
 
-//   //  Overall layout
-//   setLayout(layout);
+   //  Overall layout
+   setLayout(layout);
 }
 
 //

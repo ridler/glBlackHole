@@ -2,6 +2,8 @@
 #define VIEWPORT_H
 
 #include "helpers.h"
+#include "blackhole.h"
+#include "star.h"
 
 class ViewPort : public QGLWidget
 {
@@ -12,6 +14,9 @@ private:
    QPoint pos;       //  Mouse position
    double dim;       //  Display size
    double asp;       //  Sceen aspect ratio
+   void project();                        //  Set projection
+   QTimer animationTimer;
+
 public:
    ViewPort(QWidget* parent=0);                        //  Constructor
    QSize sizeHint() const {return QSize(400,400);}   //  Default size of widget
@@ -19,6 +24,8 @@ public:
 public slots:
     void setDIM(double DIM);    //  Slot to set dim
     // void reset(void);           //  Reset view angles
+private slots:
+    void animate();
 
 signals:
     void angles(QString text);  //  Signal for display angles
@@ -32,8 +39,6 @@ protected:
     void mouseReleaseEvent(QMouseEvent* e);  //  Mouse released
     void mouseMoveEvent(QMouseEvent* e);     //  Mouse moved
     void wheelEvent(QWheelEvent* e);         //  Mouse wheel
-private:
-    void project();                        //  Set projection
 };
 
 #endif // VIEWPORT_H

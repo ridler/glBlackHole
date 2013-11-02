@@ -6,13 +6,15 @@
 class Star
 {
 public:
-    Star(float x, float y, float z, float mass, float R, unsigned int tex);
+    Star(float pos[], float m, float R, float kep[], float mot[], unsigned int tex);
     void draw();
 private:
     float i,o,p,a,n,e,l;
+    float th, ph, rot;
     float x, y, z;
     float mass, R;
     unsigned int tex;
+    void updatePos();
 };
 
 #endif // PLANET_H
