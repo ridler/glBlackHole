@@ -14,6 +14,7 @@ private:
    QPoint pos;       //  Mouse position
    double dim;       //  Display size
    double asp;       //  Sceen aspect ratio
+   double fov;
    void project();                        //  Set projection
    QTimer animationTimer;
 

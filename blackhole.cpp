@@ -15,14 +15,14 @@ static void bhVertex(int th,int ph)
     glVertex3d(x,y,z);
 }
 
-void BlackHole::draw()
+void BlackHole::draw(float t)
 {
     glDisable(GL_LIGHTING);
     int th,ph;
     glTranslated(this->x, this->y, this->z);
     glScaled(this->R, this->R, this->R);
     //  Latitude bands
-    glColor3f(1,1,1);
+    glColor3f(t,1,1);
     for (ph=-90;ph<90;ph+=5)
     {
         glBegin(GL_QUAD_STRIP);

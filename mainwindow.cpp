@@ -10,7 +10,7 @@ MainWindow::MainWindow(QWidget* parent)
    ViewPort* galaxy = new ViewPort;
 
    //  Display widget for angles and dimension
-   QLabel* angles = new QLabel();
+   // QLabel* angles = new QLabel();
 //   //  Pushbutton to reset view angle
 //   QPushButton* reset = new QPushButton("Reset");
 

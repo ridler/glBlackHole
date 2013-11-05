@@ -7,7 +7,7 @@ class BlackHole
 {
 public:
     BlackHole(float x, float y, float z, float R, float mass);
-    void draw();
+    void draw(float t);
     float mass;
     float R;
     float x, y, z;
