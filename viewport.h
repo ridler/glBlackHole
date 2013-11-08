@@ -12,7 +12,7 @@ private:
    int    th,ph;     //  Display angles
    bool   mouse;     //  Mouse pressed
    QPoint pos;       //  Mouse position
-   double dim;       //  Display size
+   char dim;       //  Display size
    double asp;       //  Sceen aspect ratio
    double fov;
    void project();                        //  Set projection
@@ -23,7 +23,7 @@ public:
    QSize sizeHint() const {return QSize(400,400);}   //  Default size of widget
 
 public slots:
-    void setDIM(double DIM);    //  Slot to set dim
+//    void setDIM(double DIM);    //  Slot to set dim
     // void reset(void);           //  Reset view angles
 private slots:
     void animate();

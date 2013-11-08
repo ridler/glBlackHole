@@ -1,29 +1,25 @@
 #include "viewport.h"
 #include <OpenGL/glu.h>
 
-float inc = 0.1;
+float inc = 0.33;
 int elapsed = 0;
 float t = 0;
+
+float density = 0.25;
+float fogColor[4] = {0.5, 0.5, 0.5, 1.0};
 
 ViewPort::ViewPort(QWidget* parent)
     : QGLWidget(parent)
 {
     th = ph = 30;      //  Set intial display angles
     asp = 1;           //  Aspect ratio
-    dim = 10;          //  World dimension
-    fov = 0;
+    fov = 125;
     mouse = 0;         //  Mouse movement
+    dim = 10;
 
     animationTimer.setSingleShot(false);
     connect(&animationTimer, SIGNAL(timeout()), this, SLOT(animate()));
     animationTimer.start(25);
-}
-
-void ViewPort::setDIM(double DIM)
-{
-    dim = DIM;    //  Set parameter
-    project();
-    updateGL();   //  Request redisplay
 }
 
 void ViewPort::initializeGL()
@@ -50,7 +46,8 @@ void ViewPort::project()
     glLoadIdentity();
     //  Perspective transformation
     if (fov)
-       gluPerspective(fov,asp,dim/16,16*dim);
+//       gluPerspective(fov,asp,dim/8,8*dim);
+        gluPerspective(fov,asp,1.0,75);
     //  Orthogonal transformation
     else
        glOrtho(-asp*dim,asp*dim,-dim,+dim,-dim,+dim);
@@ -58,26 +55,48 @@ void ViewPort::project()
     glMatrixMode(GL_MODELVIEW);
     //  Undo previous transformations
     glLoadIdentity();
+    updateGL();
 }
 
 void ViewPort::animate()
 {
     elapsed += qobject_cast<QTimer*>(sender())->interval();
-    t = elapsed;
+    t = inc*elapsed;
     update();
 }
 
 void ViewPort::paintGL()
 {
+    glClearColor (0,0,0,1.0);
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
 
+    float Ex = -2*dim*Sin(th)*Cos(ph);
+    float Ey = +2*dim        *Sin(ph);
+    float Ez = +2*dim*Cos(th)*Cos(ph);
+    gluLookAt(Ex,Ey,Ez , 0,0,0 , 0,Cos(ph),0);
+
+    glEnable(GL_LIGHTING);
+
+    glEnable(GL_FOG);
+    glFogi (GL_FOG_MODE, GL_LINEAR);
+    glFogfv (GL_FOG_COLOR, fogColor);
+    glFogf (GL_FOG_DENSITY, density);
+    glHint (GL_FOG_HINT, GL_NICEST);
+    glFogf(GL_FOG_START, 1.0);
+    glFogf(GL_FOG_END, 5.0);
+
     float black[]   = {0.0 , 0.0 , 0.0 , 1.0};
     float white[]   = {1.0 , 1.0 , 1.0 , 1.0};
+    float red[]     = {0.5 , 0.2 , 0.2 , 1.0};
     float pos[]     = {0.0 , 0.0 , 0.0 , 1.0};
+    float posEye[]  = {Ex  , Ey  , Ez  , 1.0};
+
     glEnable(GL_NORMALIZE);
+    glEnable(GL_LIGHTING);
     glColorMaterial(GL_FRONT_AND_BACK,GL_AMBIENT_AND_DIFFUSE);
     glEnable(GL_COLOR_MATERIAL);
+
     glEnable(GL_LIGHT0);
     glLightModelfv(GL_LIGHT_MODEL_AMBIENT,black);
     glLightfv(GL_LIGHT0,GL_AMBIENT ,black);
@@ -85,16 +104,29 @@ void ViewPort::paintGL()
     glLightfv(GL_LIGHT0,GL_SPECULAR,black);
     glLightfv(GL_LIGHT0,GL_POSITION,pos);
 
-    glRotated(th,0,0,1);
-
-    BlackHole* nucleus = new BlackHole(0,0,0,2.2,612983467023);
-    nucleus->draw(t);
+    glEnable(GL_LIGHT1);
+    glLightfv(GL_LIGHT1, GL_AMBIENT, black);
+    glLightfv(GL_LIGHT1, GL_DIFFUSE, red);
+    glLightfv(GL_LIGHT0,GL_SPECULAR, black);
+    glLightfv(GL_LIGHT1, GL_POSITION, posEye);
 
     float solPos[] = {2,2,2};
     float solMot[] = {0.41,-3.1,0.0};
     float solKep[] = {0.022770,1.753555,0.273978,5.2026,0.0014503019,0.0484646,5.629731};
     Star* sol = new Star(solPos, 8000000, 70000, solKep, solMot, 0);
+
+    float lunPos[] = {1.5,1.5,1.5};
+    float lunMot[] = {0.52,2.3,.01};
+    float lunKep[] = {0.228770,0.723555,0.173978,4.8026,0.0114503019,0.00484646,4.829731};
+    Star* lun = new Star(lunPos, 666654, 56464, lunKep, lunMot, 0);
+    BlackHole* nucleus = new BlackHole(0,0,0,2.2,612983467023);
+
+    glRotated(th,0,0,1);
+
+    glDisable(GL_FOG);
+    nucleus->draw(t);
     sol->paint(t);
+    lun->paint(t);
 
     glFlush();
 }
@@ -109,22 +141,23 @@ void ViewPort::mouseMoveEvent(QMouseEvent* e)
 {
     if (mouse)
     {
+        animationTimer.stop();
         QPoint d = e->pos()-pos;  //  Change in mouse location
         th = (th+d.x())%360;      //  Translate x movement to azimuth
         ph = (ph+d.y())%360;      //  Translate y movement to elevation
         pos = e->pos();           //  Remember new location
         updateGL();               //  Request redisplay
+        animationTimer.start();
     }
 }
 
 void ViewPort::wheelEvent(QWheelEvent* e)
 {
     //  Zoom out
-    if (e->delta()<0)
-    { setDIM(dim+1); fov-=0.01; }
-    //  Zoom in
-    else if (dim>2)
-    { setDIM(dim-1); fov+=0.01; }
+    if (e->delta()<0) { fov-=1; }
+    else { fov+=1; }
+    if(fov < 0) { fov = 0; }
+    project();
     //  Signal to change dimension spinbox
     emit dimen(dim);
 }
