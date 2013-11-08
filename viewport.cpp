@@ -78,13 +78,13 @@ void ViewPort::paintGL()
 
     glEnable(GL_LIGHTING);
 
-    glEnable(GL_FOG);
-    glFogi (GL_FOG_MODE, GL_LINEAR);
-    glFogfv (GL_FOG_COLOR, fogColor);
-    glFogf (GL_FOG_DENSITY, density);
-    glHint (GL_FOG_HINT, GL_NICEST);
-    glFogf(GL_FOG_START, 1.0);
-    glFogf(GL_FOG_END, 5.0);
+//    glEnable(GL_FOG);
+//    glFogi (GL_FOG_MODE, GL_LINEAR);
+//    glFogfv (GL_FOG_COLOR, fogColor);
+//    glFogf (GL_FOG_DENSITY, density);
+//    glHint (GL_FOG_HINT, GL_NICEST);
+//    glFogf(GL_FOG_START, 1.0);
+//    glFogf(GL_FOG_END, 5.0);
 
     float black[]   = {0.0 , 0.0 , 0.0 , 1.0};
     float white[]   = {1.0 , 1.0 , 1.0 , 1.0};
@@ -121,12 +121,14 @@ void ViewPort::paintGL()
     Star* lun = new Star(lunPos, 666654, 56464, lunKep, lunMot, 0);
     BlackHole* nucleus = new BlackHole(0,0,0,2.2,612983467023);
 
+    ParticleSystem* ps1 = new ParticleSystem(300, 5,5,5);
+
     glRotated(th,0,0,1);
 
-    glDisable(GL_FOG);
     nucleus->draw(t);
     sol->paint(t);
     lun->paint(t);
+    ps1->update(t, nucleus);
 
     glFlush();
 }

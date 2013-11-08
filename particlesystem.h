@@ -8,11 +8,11 @@ class ParticleSystem
 {
 public:
     ParticleSystem(int N, float x0, float y0, float z0);
-private:
-    static int n;
-    float x, y, z;
-    static Particle* particles[];
     void update(float t, BlackHole* bh);
+private:
+    int n;
+    float x, y, z;
+    Particle* particles[];
 };
 
 #endif // PARTICLESYSTEM_H

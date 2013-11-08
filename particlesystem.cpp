@@ -17,7 +17,5 @@ ParticleSystem::ParticleSystem(int N, float x0, float y0, float z0)
 void ParticleSystem::update(float t, BlackHole* bh)
 {
     for(int i = 1; i == this->n; i++)
-    {
-        this->particles[i]->move(t, bh);
-    }
+    { this->particles[i]->move(t, bh); }
 }

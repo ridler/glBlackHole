@@ -4,26 +4,27 @@
 #include "helpers.h"
 #include "blackhole.h"
 #include "star.h"
+#include "particlesystem.h"
 
 class ViewPort : public QGLWidget
 {
-Q_OBJECT                                             //  Qt magic macro
+    Q_OBJECT                                             //  Qt magic macro
 private:
-   int    th,ph;     //  Display angles
-   bool   mouse;     //  Mouse pressed
-   QPoint pos;       //  Mouse position
-   char dim;       //  Display size
-   double asp;       //  Sceen aspect ratio
-   double fov;
-   void project();                        //  Set projection
-   QTimer animationTimer;
+    int    th,ph;     //  Display angles
+    bool   mouse;     //  Mouse pressed
+    QPoint pos;       //  Mouse position
+    char dim;       //  Display size
+    double asp;       //  Sceen aspect ratio
+    double fov;
+    void project();                        //  Set projection
+    QTimer animationTimer;
 
 public:
-   ViewPort(QWidget* parent=0);                        //  Constructor
-   QSize sizeHint() const {return QSize(400,400);}   //  Default size of widget
+    ViewPort(QWidget* parent=0);                        //  Constructor
+    QSize sizeHint() const {return QSize(400,400);}   //  Default size of widget
 
 public slots:
-//    void setDIM(double DIM);    //  Slot to set dim
+    //    void setDIM(double DIM);    //  Slot to set dim
     // void reset(void);           //  Reset view angles
 private slots:
     void animate();
