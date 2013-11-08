@@ -12,4 +12,6 @@
 #define Cos(th) cos(3.1415926/180*(th))
 #define Sin(th) sin(3.1415926/180*(th))
 
+const float G = 6.67e-11;
+
 #endif // HELPERS_H

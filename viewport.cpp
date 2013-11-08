@@ -141,13 +141,11 @@ void ViewPort::mouseMoveEvent(QMouseEvent* e)
 {
     if (mouse)
     {
-        animationTimer.stop();
         QPoint d = e->pos()-pos;  //  Change in mouse location
         th = (th+d.x())%360;      //  Translate x movement to azimuth
         ph = (ph+d.y())%360;      //  Translate y movement to elevation
         pos = e->pos();           //  Remember new location
         updateGL();               //  Request redisplay
-        animationTimer.start();
     }
 }
 

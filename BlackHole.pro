@@ -10,10 +10,14 @@ SOURCES += main.cpp\
         mainwindow.cpp \
     blackhole.cpp \
     star.cpp \
-    viewport.cpp
+    viewport.cpp \
+    particlesystem.cpp \
+    particle.cpp
 
 HEADERS  += mainwindow.h \
     blackhole.h \
     star.h \
     helpers.h \
-    viewport.h
+    viewport.h \
+    particlesystem.h \
+    particle.h

@@ -1,6 +1,5 @@
 #include "star.h"
 
-const float G = 6.67e-11;
 const float RADSCALE = 1e5;
 const float EMISS = 0;
 float shinyvec[1];    // Shininess (value)
