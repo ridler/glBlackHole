@@ -14,14 +14,13 @@ static void bhVertex(int th,int ph)
     double x = -Sin(th)*Cos(ph);
     double y =  Cos(th)*Cos(ph);
     double z =          Sin(ph);
-    glNormal3d(x, y, z);
+    //glNormal3d(x, y, z);
     glVertex3d(x,y,z);
 }
 
 void BlackHole::draw(float t)
 {
     glDisable(GL_LIGHTING);
-    glDisable(GL_FOG);
     float white[] = {1,1,1,1};
     float black[] = {0,0,0,1};
     glMaterialfv(GL_FRONT_AND_BACK,GL_SHININESS,svec);
@@ -42,6 +41,5 @@ void BlackHole::draw(float t)
         }
         glEnd();
     }
-    glEnable(GL_FOG);
     glEnable(GL_LIGHTING);
 }

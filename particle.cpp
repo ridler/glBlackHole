@@ -30,8 +30,10 @@ void Particle::move(float t, BlackHole* bh)
         vz += az*t;
         z += vz*t + 0.5*az*t*t;
 
+        glEnable(GL_POINT_SPRITE);
         glColor3f(1,1,1);
-        glBegin(GL_POINT_SPRITE);
+        glPointSize(4);
+        glBegin(GL_POINTS);
         glVertex3f(x, y, z);
         glEnd();
     }

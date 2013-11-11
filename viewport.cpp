@@ -13,7 +13,7 @@ ViewPort::ViewPort(QWidget* parent)
 {
     th = ph = 30;      //  Set intial display angles
     asp = 1;           //  Aspect ratio
-    fov = 125;
+    fov = 100;
     mouse = 0;         //  Mouse movement
     dim = 10;
 
@@ -45,12 +45,9 @@ void ViewPort::project()
     //  Undo previous transformations
     glLoadIdentity();
     //  Perspective transformation
-    if (fov)
-//       gluPerspective(fov,asp,dim/8,8*dim);
-        gluPerspective(fov,asp,1.0,75);
+    if (fov) { gluPerspective(fov,asp,dim/8,8*dim); }
     //  Orthogonal transformation
-    else
-       glOrtho(-asp*dim,asp*dim,-dim,+dim,-dim,+dim);
+    else { glOrtho(-asp*dim,asp*dim,-dim,+dim,-dim,+dim); }
     //  Switch to manipulating the model matrix
     glMatrixMode(GL_MODELVIEW);
     //  Undo previous transformations
@@ -67,7 +64,7 @@ void ViewPort::animate()
 
 void ViewPort::paintGL()
 {
-    glClearColor (0,0,0,1.0);
+//    glClearColor (0,0,0,1.0);
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
 
@@ -116,9 +113,10 @@ void ViewPort::paintGL()
     Star* sol = new Star(solPos, 8000000, 70000, solKep, solMot, 0);
 
     float lunPos[] = {1.5,1.5,1.5};
-    float lunMot[] = {0.52,2.3,.01};
-    float lunKep[] = {0.228770,0.723555,0.173978,4.8026,0.0114503019,0.00484646,4.829731};
+    float lunMot[] = {0.52,0.3,0.1};
+    float lunKep[] = {0.18770,0.923555,0.573978,4.8026,0.00214503019,0.00484646,3.829731};
     Star* lun = new Star(lunPos, 666654, 56464, lunKep, lunMot, 0);
+
     BlackHole* nucleus = new BlackHole(0,0,0,2.2,612983467023);
 
     ParticleSystem* ps1 = new ParticleSystem(300, 5,5,5);
