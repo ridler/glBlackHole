@@ -1,9 +1,7 @@
 #include "blackhole.h"
 #include "helpers.h"
 
-float svec[1];
-
-BlackHole::BlackHole(float x, float y, float z, float R, float mass)
+BlackHole::BlackHole(float x, float y, float z, float R, double mass)
 {
     this->x = x; this->y = y; this->z = z;
     this->R = R; this->mass = mass;
@@ -11,26 +9,21 @@ BlackHole::BlackHole(float x, float y, float z, float R, float mass)
 
 static void bhVertex(int th,int ph)
 {
-    double x = -Sin(th)*Cos(ph);
-    double y =  Cos(th)*Cos(ph);
-    double z =          Sin(ph);
-    //glNormal3d(x, y, z);
-    glVertex3d(x,y,z);
+    float x = -Sin(th)*Cos(ph);
+    float y =  Cos(th)*Cos(ph);
+    float z =          Sin(ph);
+    glNormal3f(x, y, z);
+    glVertex3f(x,y,z);
 }
 
 void BlackHole::draw(float t)
 {
-    glDisable(GL_LIGHTING);
-    float white[] = {1,1,1,1};
-    float black[] = {0,0,0,1};
-    glMaterialfv(GL_FRONT_AND_BACK,GL_SHININESS,svec);
-    glMaterialfv(GL_FRONT_AND_BACK,GL_SPECULAR,white);
-    glMaterialfv(GL_FRONT_AND_BACK,GL_EMISSION,black);
+    //glDisable(GL_LIGHTING);
     int th,ph;
     glTranslated(this->x, this->y, this->z);
-    glScaled(this->R, this->R, this->R);
+    glScaled(R*rScale, R*rScale, R*rScale);
     //  Latitude bands
-    glColor3f(0,0,0);
+    glColor3f(1,0,1);
     for (ph=-90;ph<90;ph+=5)
     {
         glBegin(GL_QUAD_STRIP);
@@ -41,5 +34,5 @@ void BlackHole::draw(float t)
         }
         glEnd();
     }
-    glEnable(GL_LIGHTING);
+   // glEnable(GL_LIGHTING);
 }

@@ -103,30 +103,30 @@ void ViewPort::paintGL()
 
     glEnable(GL_LIGHT1);
     glLightfv(GL_LIGHT1, GL_AMBIENT, black);
-    glLightfv(GL_LIGHT1, GL_DIFFUSE, red);
+    glLightfv(GL_LIGHT1, GL_DIFFUSE, white);
     glLightfv(GL_LIGHT0,GL_SPECULAR, black);
     glLightfv(GL_LIGHT1, GL_POSITION, posEye);
 
-    float solPos[] = {2,2,2};
-    float solMot[] = {0.41,-3.1,0.0};
-    float solKep[] = {0.022770,1.753555,0.273978,5.2026,0.0014503019,0.0484646,5.629731};
-    Star* sol = new Star(solPos, 8000000, 70000, solKep, solMot, 0);
+//    float solPos[] = {2,2,2};
+//    float solMot[] = {0.41,-3.1,0.0};
+//    float solKep[] = {0.022770,1.753555,0.273978,5.2026,0.0014503019,0.0484646,5.629731};
+//    Star* sol = new Star(solPos, 8000000, 70000, solKep, solMot, 0);
 
-    float lunPos[] = {1.5,1.5,1.5};
-    float lunMot[] = {0.52,0.3,0.1};
-    float lunKep[] = {0.18770,0.923555,0.573978,4.8026,0.00214503019,0.00484646,3.829731};
-    Star* lun = new Star(lunPos, 666654, 56464, lunKep, lunMot, 0);
+//    float lunPos[] = {1.5,1.5,1.5};
+//    float lunMot[] = {0.52,0.3,0.1};
+//    float lunKep[] = {0.18770,0.923555,0.573978,4.8026,0.00214503019,0.00484646,3.829731};
+    Star* lun = new Star(20, 15, 0, 2341, 132, 2345, 37e8, 2e30, 0);
 
-    BlackHole* nucleus = new BlackHole(0,0,0,2.2,612983467023);
+    BlackHole* nucleus = new BlackHole(0,0,0,6.7e9,8.2e36);
 
-    ParticleSystem* ps1 = new ParticleSystem(300, 5,5,5);
+    //ParticleSystem* ps1 = new ParticleSystem(300, 5,5,5);
 
     glRotated(th,0,0,1);
 
     nucleus->draw(t);
-    sol->paint(t);
-    lun->paint(t);
-    ps1->update(t, nucleus);
+    //sol->paint(t);
+    lun->paint(t, nucleus);
+    //ps1->update(t, nucleus);
 
     glFlush();
 }
