@@ -13,13 +13,13 @@ private:
     int    th,ph;     //  Display angles
     bool   mouse;     //  Mouse pressed
     QPoint pos;       //  Mouse position
-    char dim;       //  Display size
     double asp;       //  Sceen aspect ratio
     double fov;
     void project();                        //  Set projection
     QTimer animationTimer;
 
 public:
+    unsigned short int dim;       //  Display size
     ViewPort(QWidget* parent=0);                        //  Constructor
     QSize sizeHint() const {return QSize(400,400);}   //  Default size of widget
 

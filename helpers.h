@@ -15,5 +15,7 @@
 const float G = 6.67e-11;
 const float rScale = 2.9e-10;
 const float pScale = 2e-10;
+const float wmin = -1e15;
+const float wmax = 1e15;
 
 #endif // HELPERS_H

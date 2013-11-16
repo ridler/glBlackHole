@@ -16,7 +16,7 @@ static void bhVertex(int th,int ph)
     glVertex3f(x,y,z);
 }
 
-void BlackHole::draw(float t)
+void BlackHole::draw()
 {
     //glDisable(GL_LIGHTING);
     int th,ph;

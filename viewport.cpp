@@ -1,7 +1,7 @@
 #include "viewport.h"
 #include <OpenGL/glu.h>
 
-float inc = 0.33;
+float inc = 0.0001;
 int elapsed = 0;
 float t = 0;
 
@@ -123,9 +123,9 @@ void ViewPort::paintGL()
 
     glRotated(th,0,0,1);
 
-    nucleus->draw(t);
+    nucleus->draw();
     //sol->paint(t);
-    lun->paint(t, nucleus);
+    lun->paint(t, nucleus, dim);
     //ps1->update(t, nucleus);
 
     glFlush();

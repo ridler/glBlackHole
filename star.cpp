@@ -63,14 +63,22 @@ static void drawSphere(unsigned int texT)
     }
 }
 
-void Star::paint(float t, BlackHole* bh)
+static float pixel(float wx, unsigned short int dim)
+{
+    int pmin = -dim; int pmax = dim;
+    float ratio = (pmax - pmin)/(wmax - wmin);
+    float result = (wx - wmin)*ratio + pmin;
+    return result;
+}
+
+void Star::paint(float t, BlackHole* bh, unsigned short dim)
 {
     double M = bh->mass;
 
     double denom = pow(x*x + y*y + z*z, 1.5);
-    double ax = G*M*x/denom;
-    double ay = G*M*y/denom;
-    double az = G*M*z/denom;
+    double ax = G*M*(-x)/denom;
+    double ay = G*M*(-y)/denom;
+    double az = G*M*(-z)/denom;
 
     vx += ax*t;
     vy += ay*t;
@@ -79,6 +87,12 @@ void Star::paint(float t, BlackHole* bh)
     x += vx*t;
     y += vy*t;
     z += vz*t;
+
+    float xP = pixel(x, dim);
+    float yP = pixel(y, dim);
+    float zP = pixel(z, dim);
+
+    float rP = R*rScale;
 
 //    float ax, ay, az;
 //    double M = bh->mass;
@@ -95,8 +109,8 @@ void Star::paint(float t, BlackHole* bh)
 //    vz += az*t;
 //    z += vz*t + 0.5*az*t*t;
 
-    float xP = x*pScale; float yP = y*pScale; float zP = z*pScale;
-    float rP = R*rScale;
+//    float xP = x*pScale; float yP = y*pScale; float zP = z*pScale;
+//    float rP = R*rScale;
 
     std::cout << xP << "\t";
 
