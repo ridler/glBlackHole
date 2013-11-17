@@ -1,7 +1,7 @@
 #include "viewport.h"
 #include <OpenGL/glu.h>
 
-float inc = 0.0001;
+float inc = 1;
 int elapsed = 0;
 float t = 0;
 
@@ -115,7 +115,7 @@ void ViewPort::paintGL()
 //    float lunPos[] = {1.5,1.5,1.5};
 //    float lunMot[] = {0.52,0.3,0.1};
 //    float lunKep[] = {0.18770,0.923555,0.573978,4.8026,0.00214503019,0.00484646,3.829731};
-    Star* lun = new Star(20, 15, 0, 2341, 132, 2345, 37e8, 2e30, 0);
+    Star* lun = new Star(8.33e10, 1e3, 1e4, 9080000, 1.75e7, -200, 37e8, 2e30, 0);
 
     BlackHole* nucleus = new BlackHole(0,0,0,6.7e9,8.2e36);
 
@@ -123,7 +123,7 @@ void ViewPort::paintGL()
 
     glRotated(th,0,0,1);
 
-    nucleus->draw();
+    nucleus->draw(dim);
     //sol->paint(t);
     lun->paint(t, nucleus, dim);
     //ps1->update(t, nucleus);

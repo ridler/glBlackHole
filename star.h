@@ -19,6 +19,7 @@ private:
     float vx, vy, vz;
     float mass, R;
     unsigned int tex;
+    bool exists;
     //void drawSphere(unsigned int texT);
 };
 

@@ -12,7 +12,7 @@ Star::Star(float x0, float y0, float z0, float v0x, float v0y, float v0z,
     x = x0; y = y0; z = z0;
     vx = v0x; vy = v0y; vz = v0z;
     R = r; mass = m;
-    tex = texT;
+    tex = texT; exists = true;
 }
 
 //Star::Star(float pos[], float m, float R, float kep[], float mot[], unsigned int tex)
@@ -29,6 +29,14 @@ Star::Star(float x0, float y0, float z0, float v0x, float v0y, float v0z,
 //    this->e = kep[5];
 //    this->l = kep[6];
 //}
+
+static float pixel(float wx, unsigned short int dim)
+{
+    int pmin = -dim; int pmax = dim;
+    float ratio = (pmax - pmin)/(wmax - wmin);
+    float result = (wx - wmin)*ratio + pmin;
+    return result;
+}
 
 static void starVertex(int th,int ph)
 {
@@ -50,7 +58,6 @@ static void drawSphere(unsigned int texT)
 //    glEnable(GL_TEXTURE_2D);
 //    glBindTexture(GL_TEXTURE_2D,texT);
     glColor3f(1,0,0);
-    //  Latitude bands
     for (ph=-90;ph<90;ph+=5)
     {
         glBegin(GL_QUAD_STRIP);
@@ -63,22 +70,22 @@ static void drawSphere(unsigned int texT)
     }
 }
 
-static float pixel(float wx, unsigned short int dim)
-{
-    int pmin = -dim; int pmax = dim;
-    float ratio = (pmax - pmin)/(wmax - wmin);
-    float result = (wx - wmin)*ratio + pmin;
-    return result;
-}
-
 void Star::paint(float t, BlackHole* bh, unsigned short dim)
 {
+    // If the star gets inside the event horizon, it will no longer exist
+    float eh = bh->R;
+    if (x <= abs(eh) && y <= abs(eh) && z <= abs(eh))
+    { this->exists = false; return; }
+
+    // Newtonian force calculations:
     double M = bh->mass;
 
+    //std::cout << "M = " << M << "\t" << "R = " << eh << "\n";
+
     double denom = pow(x*x + y*y + z*z, 1.5);
-    double ax = G*M*(-x)/denom;
-    double ay = G*M*(-y)/denom;
-    double az = G*M*(-z)/denom;
+    double ax = -G*M*(x)/denom;
+    double ay = -G*M*(y)/denom;
+    double az = -G*M*(z)/denom;
 
     vx += ax*t;
     vy += ay*t;
@@ -88,11 +95,12 @@ void Star::paint(float t, BlackHole* bh, unsigned short dim)
     y += vy*t;
     z += vz*t;
 
+    // Scale real coordinates to screen coordinates:
     float xP = pixel(x, dim);
     float yP = pixel(y, dim);
     float zP = pixel(z, dim);
 
-    float rP = R*rScale;
+    float rP = pixel(this->R, dim);
 
 //    float ax, ay, az;
 //    double M = bh->mass;
@@ -112,7 +120,7 @@ void Star::paint(float t, BlackHole* bh, unsigned short dim)
 //    float xP = x*pScale; float yP = y*pScale; float zP = z*pScale;
 //    float rP = R*rScale;
 
-    std::cout << xP << "\t";
+    std::cout << xP << "\t\t" << yP << "\t\t" << zP << "\n";
 
     glPushMatrix();
     glTranslated(xP, yP, zP);

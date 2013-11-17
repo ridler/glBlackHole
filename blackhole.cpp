@@ -7,6 +7,14 @@ BlackHole::BlackHole(float x, float y, float z, float R, double mass)
     this->R = R; this->mass = mass;
 }
 
+static float pixel(float wx, unsigned short int dim)
+{
+    int pmin = -dim; int pmax = dim;
+    float ratio = (pmax - pmin)/(wmax - wmin);
+    float result = (wx - wmin)*ratio + pmin;
+    return result;
+}
+
 static void bhVertex(int th,int ph)
 {
     float x = -Sin(th)*Cos(ph);
@@ -16,12 +24,14 @@ static void bhVertex(int th,int ph)
     glVertex3f(x,y,z);
 }
 
-void BlackHole::draw()
+void BlackHole::draw(unsigned short int dim)
 {
+    float rP = pixel(R, dim);
     //glDisable(GL_LIGHTING);
     int th,ph;
     glTranslated(this->x, this->y, this->z);
-    glScaled(R*rScale, R*rScale, R*rScale);
+
+    glScaled(rP, rP, rP);
     //  Latitude bands
     glColor3f(1,0,1);
     for (ph=-90;ph<90;ph+=5)
