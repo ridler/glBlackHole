@@ -12,7 +12,7 @@ public:
     float vx, vy, vz;
     float ax, ay, az;
     bool exists;
-    void move(float t, BlackHole* bh);
+    void move(float t, BlackHole* bh, unsigned short dim);
 };
 
 #endif // PARTICLE_H
