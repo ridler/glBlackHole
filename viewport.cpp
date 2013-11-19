@@ -1,12 +1,19 @@
 #include "viewport.h"
 #include <OpenGL/glu.h>
 
-float inc = 0.1;
+float inc = 0.001;
 int elapsed = 0;
 float t = 0;
 
+unsigned short int DIM = 0;
+int psX, psY = 0;
+
 float density = 0.25;
 float fogColor[4] = {0.5, 0.5, 0.5, 1.0};
+
+Star* s1 = new Star(8.33e10, 0, 0, 0, 0, 8.3e7, 37e8, 2e30, 0);
+BlackHole* nucleus = new BlackHole(0,0,0,6.7e9,8.2e36);
+//ParticleSystem* ps1 = new ParticleSystem(10, psX, psY, 7, DIM);
 
 ViewPort::ViewPort(QWidget* parent)
     : QGLWidget(parent)
@@ -16,6 +23,8 @@ ViewPort::ViewPort(QWidget* parent)
     fov = 100;
     mouse = 0;         //  Mouse movement
     dim = 10;
+
+    DIM = dim;
 
     animationTimer.setSingleShot(false);
     connect(&animationTimer, SIGNAL(timeout()), this, SLOT(animate()));
@@ -87,7 +96,7 @@ void ViewPort::paintGL()
     float white[]   = {1.0 , 1.0 , 1.0 , 1.0};
     float red[]     = {0.5 , 0.2 , 0.2 , 1.0};
     float pos[]     = {0.0 , 0.0 , 0.0 , 1.0};
-    float posEye[]  = {Ex  , Ey  , Ez  , 1.0};
+    float posS1[]  = {s1->x  , s1->y  , s1->z  , 1.0};
 
     glEnable(GL_NORMALIZE);
     glEnable(GL_LIGHTING);
@@ -105,7 +114,7 @@ void ViewPort::paintGL()
     glLightfv(GL_LIGHT1, GL_AMBIENT, black);
     glLightfv(GL_LIGHT1, GL_DIFFUSE, white);
     glLightfv(GL_LIGHT0,GL_SPECULAR, black);
-    glLightfv(GL_LIGHT1, GL_POSITION, posEye);
+    glLightfv(GL_LIGHT1, GL_POSITION, posS1);
 
 //    float solPos[] = {2,2,2};
 //    float solMot[] = {0.41,-3.1,0.0};
@@ -115,24 +124,22 @@ void ViewPort::paintGL()
 //    float lunPos[] = {1.5,1.5,1.5};
 //    float lunMot[] = {0.52,0.3,0.1};
 //    float lunKep[] = {0.18770,0.923555,0.573978,4.8026,0.00214503019,0.00484646,3.829731};
-    Star* lun = new Star(8.33e10, 0, 0, 0, 0, 8.3e7, 37e8, 2e30, 0);
-
-    BlackHole* nucleus = new BlackHole(0,0,0,6.7e9,8.2e36);
-
-    ParticleSystem* ps1 = new ParticleSystem(300, 1e4, 9e9, 2e5);
 
     glRotated(th,0,0,1);
 
     nucleus->draw(dim);
     //sol->paint(t);
-    lun->paint(t, nucleus, dim);
-    ps1->update(t, nucleus, dim);
+    s1->paint(t, nucleus, dim);
+    //ps1->update(t, nucleus, dim);
 
     glFlush();
 }
 
 void ViewPort::mousePressEvent(QMouseEvent* e)
-{ mouse = true; pos = e->pos(); }
+{
+    mouse = true; pos = e->pos();
+    psX = pos.x(); psY = pos.y();
+}
 
 void ViewPort::mouseReleaseEvent(QMouseEvent* e)
 { mouse = false; }

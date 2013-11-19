@@ -91,6 +91,10 @@ void Star::paint(float t, BlackHole* bh, unsigned short dim)
     vy += ay*t;
     vz += az*t;
 
+    vx > 3e8 ? vx = 3e8 : vx = vx;
+    vy > 3e8 ? vy = 3e8 : vy = vy;
+    vz > 3e8 ? vz = 3e8 : vz = vz;
+
     x += vx*t;
     y += vy*t;
     z += vz*t;
@@ -120,7 +124,7 @@ void Star::paint(float t, BlackHole* bh, unsigned short dim)
 //    float xP = x*pScale; float yP = y*pScale; float zP = z*pScale;
 //    float rP = R*rScale;
 
-//    std::cout << xP << "\t\t" << yP << "\t\t" << zP << "\n";
+    std::cout << xP << "\t\t" << yP << "\t\t" << zP << "\n";
 
     glPushMatrix();
     glTranslated(xP, yP, zP);
