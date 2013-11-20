@@ -1,24 +1,25 @@
 #include "viewport.h"
 #include <OpenGL/glu.h>
 
-float inc = 0.001;
+float inc = 0.01;
 int elapsed = 0;
 float t = 0;
 
-unsigned short int DIM = 0;
+unsigned short int DIM = 10;
 int psX, psY = 0;
 
 float density = 0.25;
 float fogColor[4] = {0.5, 0.5, 0.5, 1.0};
 
 Star* s1 = new Star(8.33e10, 0, 0, 0, 0, 8.3e7, 37e8, 2e30, 0);
+Star* s2 = new Star(0, 7.25e10, 0, 9.4e7, 0, 0, 20e8, 3e26, 0);
 BlackHole* nucleus = new BlackHole(0,0,0,6.7e9,8.2e36);
-//ParticleSystem* ps1 = new ParticleSystem(10, psX, psY, 7, DIM);
+ParticleSystem* ps1 = new ParticleSystem(300, 0, 3e5, 5e10, DIM);
 
 ViewPort::ViewPort(QWidget* parent)
     : QGLWidget(parent)
 {
-    th = ph = 30;      //  Set intial display angles
+    th = ph = 0;      //  Set intial display angles
     asp = 1;           //  Aspect ratio
     fov = 100;
     mouse = 0;         //  Mouse movement
@@ -68,7 +69,14 @@ void ViewPort::animate()
 {
     elapsed += qobject_cast<QTimer*>(sender())->interval();
     t = inc*elapsed;
-    update();
+    updateGL();
+}
+
+void ViewPort::reset(void)
+{
+   th = ph = 0;
+   t = 0; elapsed = 0;
+   updateGL();
 }
 
 void ViewPort::paintGL()
@@ -95,8 +103,8 @@ void ViewPort::paintGL()
     float black[]   = {0.0 , 0.0 , 0.0 , 1.0};
     float white[]   = {1.0 , 1.0 , 1.0 , 1.0};
     float red[]     = {0.5 , 0.2 , 0.2 , 1.0};
-    float pos[]     = {0.0 , 0.0 , 0.0 , 1.0};
-    float posS1[]  = {s1->x  , s1->y  , s1->z  , 1.0};
+    float posS2[]   = {s2->x, s2->y, s2->z, 1.0};
+    float posS1[]   = {s1->x, s1->y, s1->z, 1.0};
 
     glEnable(GL_NORMALIZE);
     glEnable(GL_LIGHTING);
@@ -108,7 +116,7 @@ void ViewPort::paintGL()
     glLightfv(GL_LIGHT0,GL_AMBIENT ,black);
     glLightfv(GL_LIGHT0,GL_DIFFUSE ,white);
     glLightfv(GL_LIGHT0,GL_SPECULAR,black);
-    glLightfv(GL_LIGHT0,GL_POSITION,pos);
+    glLightfv(GL_LIGHT0,GL_POSITION,posS2);
 
     glEnable(GL_LIGHT1);
     glLightfv(GL_LIGHT1, GL_AMBIENT, black);
@@ -119,7 +127,6 @@ void ViewPort::paintGL()
 //    float solPos[] = {2,2,2};
 //    float solMot[] = {0.41,-3.1,0.0};
 //    float solKep[] = {0.022770,1.753555,0.273978,5.2026,0.0014503019,0.0484646,5.629731};
-//    Star* sol = new Star(solPos, 8000000, 70000, solKep, solMot, 0);
 
 //    float lunPos[] = {1.5,1.5,1.5};
 //    float lunMot[] = {0.52,0.3,0.1};
@@ -128,9 +135,9 @@ void ViewPort::paintGL()
     glRotated(th,0,0,1);
 
     nucleus->draw(dim);
-    //sol->paint(t);
     s1->paint(t, nucleus, dim);
-    //ps1->update(t, nucleus, dim);
+    s2->paint(t, nucleus, dim);
+    ps1->update(t, nucleus, dim);
 
     glFlush();
 }
@@ -138,7 +145,7 @@ void ViewPort::paintGL()
 void ViewPort::mousePressEvent(QMouseEvent* e)
 {
     mouse = true; pos = e->pos();
-    psX = pos.x(); psY = pos.y();
+    //psX = pos.x(); psY = pos.y();
 }
 
 void ViewPort::mouseReleaseEvent(QMouseEvent* e)

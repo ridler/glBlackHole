@@ -21,11 +21,11 @@ private:
 public:
     unsigned short int dim;       //  Display size
     ViewPort(QWidget* parent=0);                        //  Constructor
-    QSize sizeHint() const {return QSize(400,400);}   //  Default size of widget
+    QSize sizeHint() const {return QSize(800,600);}   //  Default size of widget
 
 public slots:
     //    void setDIM(double DIM);    //  Slot to set dim
-    // void reset(void);           //  Reset view angles
+    void reset(void);           //  Reset view angles
 private slots:
     void animate();
 

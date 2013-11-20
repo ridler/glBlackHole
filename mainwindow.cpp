@@ -12,7 +12,7 @@ MainWindow::MainWindow(QWidget* parent)
    //  Display widget for angles and dimension
    // QLabel* angles = new QLabel();
 //   //  Pushbutton to reset view angle
-//   QPushButton* reset = new QPushButton("Reset");
+   QPushButton* reset = new QPushButton("Reset");
 
 //   //  Combo box for preset s/b/r & dt & dim values
 //   QComboBox* preset = new QComboBox;
@@ -38,7 +38,7 @@ MainWindow::MainWindow(QWidget* parent)
 //   connect(z0    , SIGNAL(valueChanged(double)) , lorenz , SLOT(setZ0(double)));
 //   connect(dt    , SIGNAL(valueChanged(double)) , lorenz , SLOT(setDT(double)));
 //   connect(dim   , SIGNAL(valueChanged(double)) , lorenz , SLOT(setDIM(double)));
-//   connect(reset , SIGNAL(clicked(void))        , lorenz , SLOT(reset(void)));
+   connect(reset , SIGNAL(clicked(void))        , galaxy , SLOT(reset(void)));
 //   //  Connect lorenz signals to display widgets
 //   connect(lorenz , SIGNAL(angles(QString)) , angles , SLOT(setText(QString)));
 //   connect(lorenz , SIGNAL(dimen(double))   , dim    , SLOT(setValue(double)));
@@ -54,7 +54,7 @@ MainWindow::MainWindow(QWidget* parent)
    //  Lorenz widget
    layout->addWidget(galaxy,0,0,5,1);
 
-//   //  Group SBR parameters
+   //  Interaction
 //   QGroupBox* sbrbox = new QGroupBox("Lorenz Parameters");
 //   QGridLayout* sbrlay = new QGridLayout;
 //   sbrlay->addWidget(new QLabel("s (Prandtl)"),0,0);   sbrlay->addWidget(s,0,1);
@@ -72,14 +72,12 @@ MainWindow::MainWindow(QWidget* parent)
 //   xyzbox->setLayout(xyzlay);
 //   layout->addWidget(xyzbox,1,1);
 
-//   //  Group Display parameters
-//   QGroupBox* dspbox = new QGroupBox("Display");
-//   QGridLayout* dsplay = new QGridLayout;
-//   dsplay->addWidget(new QLabel("dt"),0,0);  dsplay->addWidget(dt,0,1);
-//   dsplay->addWidget(new QLabel("dim"),1,0); dsplay->addWidget(dim,1,1);
-//   dsplay->addWidget(angles,2,0);            dsplay->addWidget(reset,2,1);
-//   dspbox->setLayout(dsplay);
-//   layout->addWidget(dspbox,2,1);
+   //  Group Display parameters
+   QGroupBox* dspbox = new QGroupBox("Display");
+   QGridLayout* dsplay = new QGridLayout;
+   dsplay->addWidget(reset,2,1);
+   dspbox->setLayout(dsplay);
+   layout->addWidget(dspbox,2,1);
 
 //   //  Preset Values
 //   layout->addWidget(preset,3,1);

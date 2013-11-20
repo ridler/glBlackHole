@@ -12,14 +12,14 @@ static float world(int px, unsigned short int dim)
 ParticleSystem::ParticleSystem(int N, float x0, float y0, float z0, unsigned short int dim)
 {
     n = N;
-    x = world(x0, dim); y = world(y0, dim); z = world(z0, dim);
+    //x = world(x0, dim); y = world(y0, dim); z = world(z0, dim);
 
     for(int i = 0; i < n; i++)
     {
         float xx = -1e8 + (float)rand()/((float)1e8);
         float yy = -1e8 + (float)rand()/((float)1e8);
         float zz = -1e8 + (float)rand()/((float)1e8);
-        this->particles.push_back(new Particle(x+i*10000, y-xx/1e5, z-i*300, 0, 0, 0));
+        this->particles.push_back(new Particle(x0, y0, z0, xx, yy, zz));
     }
 }
 
