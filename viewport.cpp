@@ -1,5 +1,4 @@
 #include "viewport.h"
-#include <OpenGL/glu.h>
 
 float inc = 0.01;
 int elapsed = 0;

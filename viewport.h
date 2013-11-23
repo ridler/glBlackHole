@@ -6,6 +6,12 @@
 #include "star.h"
 #include "particlesystem.h"
 
+#ifdef __APPLE__
+#include <OpenGL/glu.h>
+#else
+#include <GL/glut.h>
+#endif
+
 class ViewPort : public QGLWidget
 {
     Q_OBJECT                                             //  Qt magic macro
