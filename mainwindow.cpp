@@ -13,6 +13,7 @@ MainWindow::MainWindow(QWidget* parent)
    // QLabel* angles = new QLabel();
 //   //  Pushbutton to reset view angle
    QPushButton* reset = new QPushButton("Reset");
+   QPushButton* merge = new QPushButton("Begin Merger");
 
 //   //  Combo box for preset s/b/r & dt & dim values
 //   QComboBox* preset = new QComboBox;
@@ -38,7 +39,8 @@ MainWindow::MainWindow(QWidget* parent)
 //   connect(z0    , SIGNAL(valueChanged(double)) , lorenz , SLOT(setZ0(double)));
 //   connect(dt    , SIGNAL(valueChanged(double)) , lorenz , SLOT(setDT(double)));
 //   connect(dim   , SIGNAL(valueChanged(double)) , lorenz , SLOT(setDIM(double)));
-   connect(reset , SIGNAL(clicked(void))        , galaxy , SLOT(reset(void)));
+   connect(reset, SIGNAL(clicked(void)), galaxy, SLOT(reset(void)));
+   connect(merge, SIGNAL(clicked(void)), galaxy, SLOT(beginMerge(void)));
 //   //  Connect lorenz signals to display widgets
 //   connect(lorenz , SIGNAL(angles(QString)) , angles , SLOT(setText(QString)));
 //   connect(lorenz , SIGNAL(dimen(double))   , dim    , SLOT(setValue(double)));
@@ -73,9 +75,10 @@ MainWindow::MainWindow(QWidget* parent)
 //   layout->addWidget(xyzbox,1,1);
 
    //  Group Display parameters
-   QGroupBox* dspbox = new QGroupBox("Display");
+   QGroupBox* dspbox = new QGroupBox("Controls");
    QGridLayout* dsplay = new QGridLayout;
    dsplay->addWidget(reset,2,1);
+   dsplay->addWidget(merge,3,1);
    dspbox->setLayout(dsplay);
    layout->addWidget(dspbox,2,1);
 

@@ -21,7 +21,8 @@ private:
     QPoint pos;       //  Mouse position
     double asp;       //  Sceen aspect ratio
     double fov;
-    void project();                        //  Set projection
+    bool merging;
+    void project();
     QTimer animationTimer;
 
 public:
@@ -32,6 +33,7 @@ public:
 public slots:
     //    void setDIM(double DIM);    //  Slot to set dim
     void reset(void);           //  Reset view angles
+    void beginMerge(void);
 private slots:
     void animate();
 

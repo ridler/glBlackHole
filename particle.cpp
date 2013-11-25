@@ -43,7 +43,7 @@ void Particle::move(float t, BlackHole* bh, unsigned short int dim)
     float yP = pixel(y, dim);
     float zP = pixel(z, dim);
 
-    std::cout << xP << "\t\t" << yP << "\t\t" << zP << "\t\t" << dim << "\n";
+    // std::cout << xP << "\t\t" << yP << "\t\t" << zP << "\t\t" << dim << "\n";
 
     glEnable(GL_POINT_SPRITE);
     glColor3f(1,1,1);

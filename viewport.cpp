@@ -15,6 +15,9 @@ Star* s2 = new Star(0, 7.25e10, 0, 9.4e7, 0, 0, 20e8, 3e26, 0);
 BlackHole* nucleus = new BlackHole(0,0,0,6.7e9,8.2e36);
 ParticleSystem* ps1 = new ParticleSystem(300, 0, 3e5, 5e10, DIM);
 
+BlackHole* bh1 = new BlackHole(-4.8e10, 2.5e9, 2e5, 4e5, 0, 0, 3.2e9, 4.3e29);
+BlackHole* bh2 = new BlackHole(4e10, -2.3e7, -5e9, 0, 0, 0, 5.6e9, 3.7e23);
+
 ViewPort::ViewPort(QWidget* parent)
     : QGLWidget(parent)
 {
@@ -23,7 +26,7 @@ ViewPort::ViewPort(QWidget* parent)
     fov = 100;
     mouse = 0;         //  Mouse movement
     dim = 10;
-
+    merging = false;
     DIM = dim;
 
     animationTimer.setSingleShot(false);
@@ -75,12 +78,17 @@ void ViewPort::reset(void)
 {
    th = ph = 0;
    t = 0; elapsed = 0;
+   merging = false;
    updateGL();
+}
+
+void ViewPort::beginMerge()
+{
+    merging = true; updateGL();
 }
 
 void ViewPort::paintGL()
 {
-//    glClearColor (0,0,0,1.0);
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
 
@@ -90,6 +98,10 @@ void ViewPort::paintGL()
     gluLookAt(Ex,Ey,Ez , 0,0,0 , 0,Cos(ph),0);
 
     glEnable(GL_LIGHTING);
+    glEnable(GL_NORMALIZE);
+    glEnable(GL_LIGHTING);
+    glColorMaterial(GL_FRONT_AND_BACK,GL_AMBIENT_AND_DIFFUSE);
+    glEnable(GL_COLOR_MATERIAL);
 
 //    glEnable(GL_FOG);
 //    glFogi (GL_FOG_MODE, GL_LINEAR);
@@ -102,42 +114,62 @@ void ViewPort::paintGL()
     float black[]   = {0.0 , 0.0 , 0.0 , 1.0};
     float white[]   = {1.0 , 1.0 , 1.0 , 1.0};
     float red[]     = {0.5 , 0.2 , 0.2 , 1.0};
-    float posS2[]   = {s2->x, s2->y, s2->z, 1.0};
-    float posS1[]   = {s1->x, s1->y, s1->z, 1.0};
-
-    glEnable(GL_NORMALIZE);
-    glEnable(GL_LIGHTING);
-    glColorMaterial(GL_FRONT_AND_BACK,GL_AMBIENT_AND_DIFFUSE);
-    glEnable(GL_COLOR_MATERIAL);
-
-    glEnable(GL_LIGHT0);
-    glLightModelfv(GL_LIGHT_MODEL_AMBIENT,black);
-    glLightfv(GL_LIGHT0,GL_AMBIENT ,black);
-    glLightfv(GL_LIGHT0,GL_DIFFUSE ,white);
-    glLightfv(GL_LIGHT0,GL_SPECULAR,black);
-    glLightfv(GL_LIGHT0,GL_POSITION,posS2);
-
-    glEnable(GL_LIGHT1);
-    glLightfv(GL_LIGHT1, GL_AMBIENT, black);
-    glLightfv(GL_LIGHT1, GL_DIFFUSE, white);
-    glLightfv(GL_LIGHT0,GL_SPECULAR, black);
-    glLightfv(GL_LIGHT1, GL_POSITION, posS1);
-
-//    float solPos[] = {2,2,2};
-//    float solMot[] = {0.41,-3.1,0.0};
-//    float solKep[] = {0.022770,1.753555,0.273978,5.2026,0.0014503019,0.0484646,5.629731};
-
-//    float lunPos[] = {1.5,1.5,1.5};
-//    float lunMot[] = {0.52,0.3,0.1};
-//    float lunKep[] = {0.18770,0.923555,0.573978,4.8026,0.00214503019,0.00484646,3.829731};
 
     glRotated(th,0,0,1);
 
-    nucleus->draw(dim);
-    s1->paint(t, nucleus, dim);
-    s2->paint(t, nucleus, dim);
-    ps1->update(t, nucleus, dim);
+    if (merging)
+    {
+        float posBH1[] = { bh1->x, bh1->y, bh1->z };
+        float posBH2[] = { bh2->x, bh2->y, bh2->z };
 
+        glEnable(GL_LIGHT0);
+        glLightModelfv(GL_LIGHT_MODEL_AMBIENT,black);
+        glLightfv(GL_LIGHT0,GL_AMBIENT ,black);
+        glLightfv(GL_LIGHT0,GL_DIFFUSE ,white);
+        glLightfv(GL_LIGHT0,GL_SPECULAR,black);
+        glLightfv(GL_LIGHT0,GL_POSITION,posBH1);
+
+        glEnable(GL_LIGHT1);
+        glLightfv(GL_LIGHT1, GL_AMBIENT, black);
+        glLightfv(GL_LIGHT1, GL_DIFFUSE, white);
+        glLightfv(GL_LIGHT0,GL_SPECULAR, black);
+        glLightfv(GL_LIGHT1, GL_POSITION, posBH2);
+
+        bh1->draw(t, bh2, merging, dim);
+        bh2->draw(t, bh1, merging, dim);
+    }
+
+    else
+    {
+        float posS2[]   = {s2->x, s2->y, s2->z, 1.0};
+        float posS1[]   = {s1->x, s1->y, s1->z, 1.0};
+
+        glEnable(GL_LIGHT0);
+        glLightModelfv(GL_LIGHT_MODEL_AMBIENT,black);
+        glLightfv(GL_LIGHT0,GL_AMBIENT ,black);
+        glLightfv(GL_LIGHT0,GL_DIFFUSE ,white);
+        glLightfv(GL_LIGHT0,GL_SPECULAR,black);
+        glLightfv(GL_LIGHT0,GL_POSITION,posS2);
+
+        glEnable(GL_LIGHT1);
+        glLightfv(GL_LIGHT1, GL_AMBIENT, black);
+        glLightfv(GL_LIGHT1, GL_DIFFUSE, white);
+        glLightfv(GL_LIGHT0,GL_SPECULAR, black);
+        glLightfv(GL_LIGHT1, GL_POSITION, posS1);
+
+        //    float solPos[] = {2,2,2};
+        //    float solMot[] = {0.41,-3.1,0.0};
+        //    float solKep[] = {0.022770,1.753555,0.273978,5.2026,0.0014503019,0.0484646,5.629731};
+
+        //    float lunPos[] = {1.5,1.5,1.5};
+        //    float lunMot[] = {0.52,0.3,0.1};
+        //    float lunKep[] = {0.18770,0.923555,0.573978,4.8026,0.00214503019,0.00484646,3.829731};
+
+        nucleus->draw(t, NULL, merging, dim);
+        s1->paint(t, nucleus, dim);
+        s2->paint(t, nucleus, dim);
+        ps1->update(t, nucleus, dim);
+    }
     glFlush();
 }
 

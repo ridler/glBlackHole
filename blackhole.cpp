@@ -5,6 +5,15 @@ BlackHole::BlackHole(float x, float y, float z, float R, double mass)
 {
     this->x = x; this->y = y; this->z = z;
     this->R = R; this->mass = mass;
+    vx = vy = vz = 0;
+}
+
+BlackHole::BlackHole(float x, float y, float z, float v0x, float v0y, float v0z,
+                     float R, double mass)
+{
+    vx = v0x; vy = v0y; vz = v0z;
+    this->x = x; this->y = y; this->z = z;
+    this->R = R; this->mass = mass;
 }
 
 static float pixel(float wx, unsigned short int dim)
@@ -24,15 +33,47 @@ static void bhVertex(int th,int ph)
     glVertex3f(x,y,z);
 }
 
-void BlackHole::draw(unsigned short int dim)
+void BlackHole::draw(float t, BlackHole* bh, bool mergeMode, unsigned short int dim)
 {
+    if (mergeMode)
+    {
+//        double dx = (sx - x);
+//        double dy = (sy - y);
+//        double denominator = pow(dx*dx + dy*dy, 1.5);
+//        return G*m*dx/denominator;
+
+        //float r  = pow(pow(this->x - bh->x, 2) + pow(this->y - bh->y) + pow(this->z - bh->z), 0.5);
+
+        float rx = bh->x - this->x;
+        float ry = bh->y - this->y;
+        float rz = bh->z - this->z;
+
+        float M = bh->mass;
+        double denom = pow(x*x + y*y + z*z, 1.5);
+        double ax = G*M*(rx)/denom;
+        double ay = G*M*(ry)/denom;
+        double az = G*M*(rz)/denom;
+
+        vx += ax*t;
+        vy += ay*t;
+        vz += az*t;
+
+        vx > 3e8 ? vx = 3e8 : vx = vx;
+        vy > 3e8 ? vy = 3e8 : vy = vy;
+        vz > 3e8 ? vz = 3e8 : vz = vz;
+
+        x += vx*t;
+        y += vy*t;
+        z += vz*t;
+    }
+
     float rP = pixel(R, dim);
-    //glDisable(GL_LIGHTING);
+    float xP = pixel(x, dim); float yP = pixel(y, dim); float zP = pixel(z, dim);
     int th,ph;
-    glTranslated(this->x, this->y, this->z);
+
+    glTranslated(xP, yP, zP);
 
     glScaled(rP, rP, rP);
-    //  Latitude bands
     glColor3f(1,0,1);
     for (ph=-90;ph<90;ph+=5)
     {
