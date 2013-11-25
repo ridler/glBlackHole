@@ -15,8 +15,8 @@ Star* s2 = new Star(0, 7.25e10, 0, 9.4e7, 0, 0, 20e8, 3e26, 0);
 BlackHole* nucleus = new BlackHole(0,0,0,6.7e9,8.2e36);
 ParticleSystem* ps1 = new ParticleSystem(300, 0, 3e5, 5e10, DIM);
 
-BlackHole* bh1 = new BlackHole(-4.8e10, 2.5e9, 2e5, 4e5, 0, 0, 3.2e9, 4.3e29);
-BlackHole* bh2 = new BlackHole(4e10, -2.3e7, -5e9, 0, 0, 0, 5.6e9, 3.7e23);
+BlackHole* bh1 = new BlackHole(-4.8e10, 2.5e9, 2e5, 2e4, 0, 0, 3.2e9, 4.3e29);
+BlackHole* bh2 = new BlackHole(2.2e11, -2.3e7, -5e9, 0, 0, 0, 5.6e9, 3.7e23);
 
 ViewPort::ViewPort(QWidget* parent)
     : QGLWidget(parent)
@@ -79,12 +79,13 @@ void ViewPort::reset(void)
    th = ph = 0;
    t = 0; elapsed = 0;
    merging = false;
+   fov -= 25;
    updateGL();
 }
 
 void ViewPort::beginMerge()
 {
-    merging = true; updateGL();
+    merging = true; fov += 25; updateGL();
 }
 
 void ViewPort::paintGL()
@@ -97,7 +98,6 @@ void ViewPort::paintGL()
     float Ez = +2*dim*Cos(th)*Cos(ph);
     gluLookAt(Ex,Ey,Ez , 0,0,0 , 0,Cos(ph),0);
 
-    glEnable(GL_LIGHTING);
     glEnable(GL_NORMALIZE);
     glEnable(GL_LIGHTING);
     glColorMaterial(GL_FRONT_AND_BACK,GL_AMBIENT_AND_DIFFUSE);

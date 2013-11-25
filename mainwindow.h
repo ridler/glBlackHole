@@ -6,17 +6,13 @@
 
 class MainWindow : public QWidget
 {
-Q_OBJECT                 //  Qt magic macro
+Q_OBJECT
 private:
-//   QDoubleSpinBox* s;    //  Spinbox for s
-//   QDoubleSpinBox* b;    //  Spinbox for b
-//   QDoubleSpinBox* r;    //  Spinbox for r
-//   QDoubleSpinBox* dt;   //  Spinbox for dt
-//   QDoubleSpinBox* dim;  //  Spinbox for dim
+
 public:
-   MainWindow(QWidget* parent=0); //  Constructor
+   MainWindow(QWidget* parent=0);
 private slots:
-   // void setPAR(const QString&); //  Slot to set s,b,r,dt,dim
+   // maybe
 };
 
 #endif // MAINWINDOW_H

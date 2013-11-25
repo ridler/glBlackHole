@@ -14,9 +14,9 @@
 #define Cos(th) cos(3.1415926/180*(th))
 #define Sin(th) sin(3.1415926/180*(th))
 
+// Gravatational constant
 const float G = 6.67e-11;
-const float rScale = 2.9e-10;
-const float pScale = 2e-10;
+// World size
 const float wmin = -5e10;
 const float wmax = -wmin;
 

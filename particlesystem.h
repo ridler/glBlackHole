@@ -11,8 +11,8 @@ public:
     ParticleSystem(int N, float x0, float y0, float z0, unsigned short dim);
     void update(float t, BlackHole* bh, unsigned short dim);
 private:
-    int n;
-    float x, y, z;
+    int n;              // number of particles
+    float x, y, z;      // source position
     std::vector<Particle*> particles;
 };
 

@@ -16,6 +16,7 @@ BlackHole::BlackHole(float x, float y, float z, float v0x, float v0y, float v0z,
     this->R = R; this->mass = mass;
 }
 
+// convert from real coordinates to screen coordinates
 static float pixel(float wx, unsigned short int dim)
 {
     int pmin = -dim; int pmax = dim;
@@ -47,12 +48,15 @@ void BlackHole::draw(float t, BlackHole* bh, bool mergeMode, unsigned short int 
         float rx = bh->x - this->x;
         float ry = bh->y - this->y;
         float rz = bh->z - this->z;
-
         float M = bh->mass;
-        double denom = pow(x*x + y*y + z*z, 1.5);
-        double ax = G*M*(rx)/denom;
-        double ay = G*M*(ry)/denom;
-        double az = G*M*(rz)/denom;
+        float ax = G*M/(rx*rx);
+        float ay = G*M/(ry*ry);
+        float az = G*M/(rz*rz);
+
+//        double denom = pow(x*x + y*y + z*z, 1.5);
+//        double ax = G*M*(rx)/denom;
+//        double ay = G*M*(ry)/denom;
+//        double az = G*M*(rz)/denom;
 
         vx += ax*t;
         vy += ay*t;
@@ -62,9 +66,9 @@ void BlackHole::draw(float t, BlackHole* bh, bool mergeMode, unsigned short int 
         vy > 3e8 ? vy = 3e8 : vy = vy;
         vz > 3e8 ? vz = 3e8 : vz = vz;
 
-        x += vx*t;
-        y += vy*t;
-        z += vz*t;
+        x += ax*t*t + vx*t;
+        y += ay*t*t + vy*t;
+        z += az*t*t + vz*t;
     }
 
     float rP = pixel(R, dim);

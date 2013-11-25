@@ -14,26 +14,26 @@
 
 class ViewPort : public QGLWidget
 {
-    Q_OBJECT                                             //  Qt magic macro
+    Q_OBJECT
 private:
     int    th,ph;     //  Display angles
     bool   mouse;     //  Mouse pressed
     QPoint pos;       //  Mouse position
     double asp;       //  Sceen aspect ratio
-    double fov;
-    bool merging;
+    double fov;       //  field of view
+    bool merging;     //  switches modes
+
     void project();
     QTimer animationTimer;
 
 public:
-    unsigned short int dim;       //  Display size
-    ViewPort(QWidget* parent=0);                        //  Constructor
-    QSize sizeHint() const {return QSize(800,600);}   //  Default size of widget
+    unsigned short int dim;
+    ViewPort(QWidget* parent=0);
+    QSize sizeHint() const {return QSize(800,600);}
 
 public slots:
-    //    void setDIM(double DIM);    //  Slot to set dim
-    void reset(void);           //  Reset view angles
-    void beginMerge(void);
+    void reset(void);           // Reset view
+    void beginMerge(void);      // Switch modes
 private slots:
     void animate();
 
@@ -42,9 +42,9 @@ signals:
     void dimen(double dim);     //  Signal for display dimensions
 
 protected:
-    void initializeGL();                   //  Initialize widget
-    void resizeGL(int width, int height);  //  Resize widget
-    void paintGL();                        //  Draw widget
+    void initializeGL();                     //  Initialize widget
+    void resizeGL(int width, int height);    //  Resize widget
+    void paintGL();                          //  Draw widget
     void mousePressEvent(QMouseEvent* e);    //  Mouse pressed
     void mouseReleaseEvent(QMouseEvent* e);  //  Mouse released
     void mouseMoveEvent(QMouseEvent* e);     //  Mouse moved
