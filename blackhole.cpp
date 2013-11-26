@@ -49,26 +49,26 @@ void BlackHole::draw(float t, BlackHole* bh, bool mergeMode, unsigned short int 
         float ry = bh->y - this->y;
         float rz = bh->z - this->z;
         float M = bh->mass;
-        float ax = G*M/(rx*rx);
-        float ay = G*M/(ry*ry);
-        float az = G*M/(rz*rz);
+        float ax = -G*M/(rx*rx);
+        float ay = -G*M/(ry*ry);
+        float az = -G*M/(rz*rz);
 
 //        double denom = pow(x*x + y*y + z*z, 1.5);
 //        double ax = G*M*(rx)/denom;
 //        double ay = G*M*(ry)/denom;
 //        double az = G*M*(rz)/denom;
 
-        vx += ax*t;
-        vy += ay*t;
-        vz += az*t;
+        this->vx += ax*t;
+        this->vy += ay*t;
+        this->vz += az*t;
 
         vx > 3e8 ? vx = 3e8 : vx = vx;
         vy > 3e8 ? vy = 3e8 : vy = vy;
         vz > 3e8 ? vz = 3e8 : vz = vz;
 
-        x += ax*t*t + vx*t;
-        y += ay*t*t + vy*t;
-        z += az*t*t + vz*t;
+        this->x += ax*t*t + this->vx*t;
+        this->y += ay*t*t + this->vy*t;
+        this->z += az*t*t + this->vz*t;
     }
 
     float rP = pixel(R, dim);

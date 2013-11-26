@@ -1,6 +1,6 @@
 #include "viewport.h"
 
-float inc = 0.01;
+float inc = 0.1;
 int elapsed = 0;
 float t = 0;
 
@@ -10,13 +10,13 @@ int psX, psY = 0;
 float density = 0.25;
 float fogColor[4] = {0.5, 0.5, 0.5, 1.0};
 
-Star* s1 = new Star(8.33e10, 0, 0, 0, 0, 8.3e7, 37e8, 2e30, 0);
-Star* s2 = new Star(0, 7.25e10, 0, 9.4e7, 0, 0, 20e8, 3e26, 0);
+Star* s1 = new Star(8.33e10, 0, 0, 0, 0, 8.3e7, 37e8, 2e30);
+Star* s2 = new Star(0, 7.25e10, 0, 9.4e7, 0, 0, 20e8, 3e26);
 BlackHole* nucleus = new BlackHole(0,0,0,6.7e9,8.2e36);
 ParticleSystem* ps1 = new ParticleSystem(300, 0, 3e5, 5e10, DIM);
 
 BlackHole* bh1 = new BlackHole(-4.8e10, 2.5e9, 2e5, 2e4, 0, 0, 3.2e9, 4.3e29);
-BlackHole* bh2 = new BlackHole(2.2e11, -2.3e7, -5e9, 0, 0, 0, 5.6e9, 3.7e23);
+BlackHole* bh2 = new BlackHole(2.2e11, -2.3e7, -5e9, -2e7, 0, 0, 5.6e9, 3.7e23);
 
 ViewPort::ViewPort(QWidget* parent)
     : QGLWidget(parent)
@@ -98,6 +98,9 @@ void ViewPort::paintGL()
     float Ez = +2*dim*Cos(th)*Cos(ph);
     gluLookAt(Ex,Ey,Ez , 0,0,0 , 0,Cos(ph),0);
 
+    for (unsigned char i = 0; i < 2; ++i) {
+        glBindTexture(GL_TEXTURE_2D, textures[i]); }
+
     glEnable(GL_NORMALIZE);
     glEnable(GL_LIGHTING);
     glColorMaterial(GL_FRONT_AND_BACK,GL_AMBIENT_AND_DIFFUSE);
@@ -132,7 +135,7 @@ void ViewPort::paintGL()
         glEnable(GL_LIGHT1);
         glLightfv(GL_LIGHT1, GL_AMBIENT, black);
         glLightfv(GL_LIGHT1, GL_DIFFUSE, white);
-        glLightfv(GL_LIGHT0,GL_SPECULAR, black);
+        glLightfv(GL_LIGHT0, GL_SPECULAR, black);
         glLightfv(GL_LIGHT1, GL_POSITION, posBH2);
 
         bh1->draw(t, bh2, merging, dim);
@@ -166,8 +169,8 @@ void ViewPort::paintGL()
         //    float lunKep[] = {0.18770,0.923555,0.573978,4.8026,0.00214503019,0.00484646,3.829731};
 
         nucleus->draw(t, NULL, merging, dim);
-        s1->paint(t, nucleus, dim);
-        s2->paint(t, nucleus, dim);
+        s1->paint(t, nucleus, dim, textures[0]);
+        s2->paint(t, nucleus, dim, 0);
         ps1->update(t, nucleus, dim);
     }
     glFlush();
@@ -196,11 +199,19 @@ void ViewPort::mouseMoveEvent(QMouseEvent* e)
 
 void ViewPort::wheelEvent(QWheelEvent* e)
 {
-    //  Zoom out
+    // Zoom out
     if (e->delta()<0) { fov-=1; }
+    // Zoom in
     else { fov+=1; }
     if(fov < 0) { fov = 0; }
     project();
-    //  Signal to change dimension spinbox
-    emit dimen(dim);
+}
+
+void ViewPort::genTex()
+{
+    for (unsigned char j=0; j < 2; ++j)
+    {
+        textures[j] = bindTexture
+            (QPixmap(QString(":textures/tex%1.png").arg(j + 1)), GL_TEXTURE_2D);
+    }
 }

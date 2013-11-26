@@ -5,6 +5,7 @@
 #include "blackhole.h"
 #include "star.h"
 #include "particlesystem.h"
+#include <QGLWidget>
 
 #ifdef __APPLE__
 #include <OpenGL/glu.h>
@@ -22,7 +23,8 @@ private:
     double asp;       //  Sceen aspect ratio
     double fov;       //  field of view
     bool merging;     //  switches modes
-
+    unsigned int textures[2];
+    void genTex();
     void project();
     QTimer animationTimer;
 

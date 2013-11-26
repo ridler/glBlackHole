@@ -2,7 +2,6 @@
 #define HELPERS_H
 
 #include <cmath>
-#include <QGLWidget>
 #include <QString>
 #include <QWidget>
 #include <QtOpenGL>

@@ -1,18 +1,18 @@
 #include "star.h"
 #include <iostream>
 
-const float EMISS = 0;
+const float EMISS = 16;
 float shinyvec[1];    // Shininess (value)
 float yellow[] = {1.0,1.0,0.0,1.0};
 float Emission[]  = {0.0,0.0,0.01*EMISS,1.0};
 
 Star::Star(float x0, float y0, float z0, float v0x, float v0y, float v0z,
-           float r, double m, unsigned int texT)
+           float r, double m)
 {
     x = x0; y = y0; z = z0;
     vx = v0x; vy = v0y; vz = v0z;
     R = r; mass = m;
-    tex = texT; exists = true;
+    exists = true;
 }
 
 //Star::Star(float pos[], float m, float R, float kep[], float mot[], unsigned int tex)
@@ -44,20 +44,20 @@ static void starVertex(int th,int ph)
     float y =  Cos(th)*Cos(ph);
     float z =          Sin(ph);
     glNormal3f(x,y,z);
-    //glTexCoord2d(th/360.0,ph/180.0+0.5);
+    glTexCoord2d(th/360.0,ph/180.0+0.5);
     glVertex3f(x,y,z);
 }
 
 static void drawSphere(unsigned int texT)
 {
     int th,ph;
-    glMaterialfv(GL_FRONT,GL_SHININESS,shinyvec);
-    glMaterialfv(GL_FRONT,GL_SPECULAR,yellow);
-    glMaterialfv(GL_FRONT,GL_EMISSION,Emission);
+//    glMaterialfv(GL_FRONT,GL_SHININESS,shinyvec);
+//    glMaterialfv(GL_FRONT,GL_SPECULAR,yellow);
+//    glMaterialfv(GL_FRONT,GL_EMISSION,Emission);
     //  Set texture
-//    glEnable(GL_TEXTURE_2D);
-//    glBindTexture(GL_TEXTURE_2D,texT);
-    glColor3f(1,0,0);
+    glEnable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D,texT);
+    //glColor3f(1,0,0);
     for (ph=-90;ph<90;ph+=5)
     {
         glBegin(GL_QUAD_STRIP);
@@ -70,7 +70,7 @@ static void drawSphere(unsigned int texT)
     }
 }
 
-void Star::paint(float t, BlackHole* bh, unsigned short dim)
+void Star::paint(float t, BlackHole* bh, unsigned short dim, unsigned int texT)
 {
     // If the star gets inside the event horizon, it will no longer exist
     float eh = bh->R;
@@ -129,7 +129,7 @@ void Star::paint(float t, BlackHole* bh, unsigned short dim)
     glPushMatrix();
     glTranslated(xP, yP, zP);
     glScaled(rP, rP, rP);
-    drawSphere(0);
+    drawSphere(texT);
     glPopMatrix();
 
 //    //  Apply keplerian elements to determine orbit
