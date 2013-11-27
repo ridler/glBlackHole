@@ -8,7 +8,7 @@
 class ParticleSystem
 {
 public:
-    ParticleSystem(int N, float x0, float y0, float z0, unsigned short dim);
+    ParticleSystem(int N, float x0, float y0, float z0);
     void update(float t, BlackHole* bh, unsigned short dim);
 private:
     int n;              // number of particles

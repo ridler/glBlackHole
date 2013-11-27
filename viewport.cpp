@@ -1,6 +1,6 @@
 #include "viewport.h"
 
-float inc = 0.1;
+float inc = 0.01;
 int elapsed = 0;
 float t = 0;
 
@@ -10,13 +10,15 @@ int psX, psY = 0;
 float density = 0.25;
 float fogColor[4] = {0.5, 0.5, 0.5, 1.0};
 
+// main mode objects
 Star* s1 = new Star(8.33e10, 0, 0, 0, 0, 8.3e7, 37e8, 2e30);
 Star* s2 = new Star(0, 7.25e10, 0, 9.4e7, 0, 0, 20e8, 3e26);
 BlackHole* nucleus = new BlackHole(0,0,0,6.7e9,8.2e36);
-ParticleSystem* ps1 = new ParticleSystem(300, 0, 3e5, 5e10, DIM);
+ParticleSystem* ps1 = new ParticleSystem(300, 0, 3e5, 5e10);
 
+// merge mode objects
 BlackHole* bh1 = new BlackHole(-4.8e10, 2.5e9, 2e5, 2e4, 0, 0, 3.2e9, 4.3e29);
-BlackHole* bh2 = new BlackHole(2.2e11, -2.3e7, -5e9, -2e7, 0, 0, 5.6e9, 3.7e23);
+BlackHole* bh2 = new BlackHole(2.2e11, -2.3e7, -5e9, -2e4, 0, 0, 5.6e9, 3.7e23);
 
 ViewPort::ViewPort(QWidget* parent)
     : QGLWidget(parent)
@@ -36,33 +38,25 @@ ViewPort::ViewPort(QWidget* parent)
 
 void ViewPort::initializeGL()
 {
-    glEnable(GL_DEPTH_TEST); //  Enable Z-buffer depth testing
-    setMouseTracking(true);  //  Ask for mouse events
+    glEnable(GL_DEPTH_TEST);
+    setMouseTracking(true);
+    genTex();
 }
 
 void ViewPort::resizeGL(int width, int height)
 {
-    //  Window aspect ration
     asp = (width && height) ? width / (float)height : 1;
     //  Viewport is whole screen
     glViewport(0,0,width,height);
-    //  Set projection
     project();
 }
 
 void ViewPort::project()
 {
-    //  Tell OpenGL we want to manipulate the projection matrix
     glMatrixMode(GL_PROJECTION);
-    //  Undo previous transformations
     glLoadIdentity();
-    //  Perspective transformation
-    if (fov) { gluPerspective(fov,asp,dim/8,8*dim); }
-    //  Orthogonal transformation
-    else { glOrtho(-asp*dim,asp*dim,-dim,+dim,-dim,+dim); }
-    //  Switch to manipulating the model matrix
+    gluPerspective(fov,asp,dim/8,8*dim);
     glMatrixMode(GL_MODELVIEW);
-    //  Undo previous transformations
     glLoadIdentity();
     updateGL();
 }
@@ -116,7 +110,7 @@ void ViewPort::paintGL()
 
     float black[]   = {0.0 , 0.0 , 0.0 , 1.0};
     float white[]   = {1.0 , 1.0 , 1.0 , 1.0};
-    float red[]     = {0.5 , 0.2 , 0.2 , 1.0};
+    // float red[]     = {0.5 , 0.2 , 0.2 , 1.0};
 
     glRotated(th,0,0,1);
 
@@ -179,10 +173,9 @@ void ViewPort::paintGL()
 void ViewPort::mousePressEvent(QMouseEvent* e)
 {
     mouse = true; pos = e->pos();
-    //psX = pos.x(); psY = pos.y();
 }
 
-void ViewPort::mouseReleaseEvent(QMouseEvent* e)
+void ViewPort::mouseReleaseEvent(QMouseEvent *e)
 { mouse = false; }
 
 void ViewPort::mouseMoveEvent(QMouseEvent* e)

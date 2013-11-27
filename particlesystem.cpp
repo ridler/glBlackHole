@@ -1,20 +1,20 @@
 #include "particlesystem.h"
 #include <iostream>
 
-static float world(int px, unsigned short int dim)
-{
-    float pmin = -dim; float pmax = dim;
-    double wx;
-    wx = wmin + ((wmax - wmin)/(pmax - pmin))*(px - pmin);
-    return wx;
-}
+// For possible use with generating particles at mouse click coordinates:
+//static float world(int px, unsigned short int dim)
+//{
+//    float pmin = -dim; float pmax = dim;
+//    double wx;
+//    wx = wmin + ((wmax - wmin)/(pmax - pmin))*(px - pmin);
+//    return wx;
+//}
 
-ParticleSystem::ParticleSystem(int N, float x0, float y0, float z0, unsigned short int dim)
+ParticleSystem::ParticleSystem(int N, float x0, float y0, float z0)
 {
     n = N;
-    //x = world(x0, dim); y = world(y0, dim); z = world(z0, dim);
 
-    for(int i = 0; i < n; i++)
+    for(unsigned short int i = 0; i < n; i++)
     {
         float xx = -1e8 + (float)rand()/((float)1e8);
         float yy = -1e8 + (float)rand()/((float)1e8);
@@ -27,5 +27,4 @@ void ParticleSystem::update(float t, BlackHole* bh, unsigned short int dim)
 {
     for(unsigned short int i = 0; i < particles.size(); i++)
     { particles.at(i)->move(t, bh, dim); }
-    //exit(0);
 }
