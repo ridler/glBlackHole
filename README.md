@@ -1,5 +1,7 @@
 # Black Hole Simulation
 
+view this file formatted nicely at: https://github.com/ridler/glBlackHole/blob/master/README.md
+
 ## Status as of 11/27/2013
 
 ### How to run the program:
