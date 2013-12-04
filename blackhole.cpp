@@ -36,6 +36,7 @@ static void bhVertex(int th,int ph)
 
 void BlackHole::draw(float t, BlackHole* bh, bool mergeMode, unsigned short int dim)
 {
+    glDisable(GL_LIGHTING);
     if (mergeMode)
     {
 //        double dx = (sx - x);
@@ -78,7 +79,7 @@ void BlackHole::draw(float t, BlackHole* bh, bool mergeMode, unsigned short int 
     glTranslated(xP, yP, zP);
 
     glScaled(rP, rP, rP);
-    glColor3f(1,0,1);
+    glColor3f(0,0,0);
     for (ph=-90;ph<90;ph+=5)
     {
         glBegin(GL_QUAD_STRIP);
@@ -89,5 +90,6 @@ void BlackHole::draw(float t, BlackHole* bh, bool mergeMode, unsigned short int 
         }
         glEnd();
     }
-   // glEnable(GL_LIGHTING);
+   glEnable(GL_LIGHTING);
+   glColor3f(1,1,0);
 }

@@ -22,9 +22,11 @@ BlackHole* nucleus = new BlackHole(0,0,0,6.7e9,8.2e36);
 BlackHole* bh1 = new BlackHole(-4.8e10, 2.5e9, 2e5, 2e4, 0, 0, 3.2e9, 4.3e29);
 BlackHole* bh2 = new BlackHole(2.2e11, -2.3e7, -5e9, -2e4, 0, 0, 5.6e9, 3.7e23);
 
-const unsigned short int nPoints = 10000;
-float pointsVx[100]; float pointsVy[100]; float pointsVz[100];
+const unsigned short int nPoints = 50000;
 float pointsX[nPoints]; float pointsY[nPoints]; float pointsZ[nPoints];
+
+const unsigned short int nCloudPs = 90000;
+float cpX[nCloudPs]; float cpY[nCloudPs]; float cpZ[nCloudPs];
 
 static float pixel(float wx, unsigned short int dim)
 {
@@ -32,6 +34,14 @@ static float pixel(float wx, unsigned short int dim)
     float ratio = (pmax - pmin)/(wmax - wmin);
     float result = (wx - wmin)*ratio + pmin;
     return result;
+}
+
+static float world(int px, unsigned short int dim)
+{
+    float pmin = -dim; float pmax = dim;
+    double wx;
+    wx = wmin + ((wmax - wmin)/(pmax - pmin))*(px - pmin);
+    return wx;
 }
 
 ViewPort::ViewPort(QWidget* parent)
@@ -57,7 +67,7 @@ void ViewPort::initializeGL()
     genTex();
 
     MTRand r(123);
-    double R = nucleus->R + 2.6e10;
+    double R = nucleus->R + 5e10;
     for (unsigned short int i = 0; i < nPoints; ++i)
     {
         double theta = 2*M_PI*r();
@@ -68,12 +78,12 @@ void ViewPort::initializeGL()
         //cout << x << " " << y << endl;
     }
 
-//    for(unsigned char i = 0; i < 100; i++)
-//    {
-//        pointsX[i] = cos(-nucleus->R) + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(cos(nucleus->R+8e10)+cos(nucleus->R))));
-//        pointsY[i] = -nucleus->R/4 + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(nucleus->R/4+nucleus->R/4)));
-//        pointsZ[i] = cos(-nucleus->R) + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(cos(nucleus->R+8e10)+cos(nucleus->R))));
-//    }
+    for (unsigned short int i = 0; i < nCloudPs; ++i)
+    {
+        cpX[i] = -fov + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(2*fov)));
+        cpY[i] = -fov + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(2*fov)));
+        cpZ[i] = -fov + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(2*fov)));
+    }
 }
 
 void ViewPort::resizeGL(int width, int height)
@@ -173,6 +183,7 @@ void ViewPort::paintGL()
     {
         float posS2[]   = {s2->x, s2->y, s2->z, 1.0};
         float posS1[]   = {s1->x, s1->y, s1->z, 1.0};
+        float origin[] = {0,0,0,1};
 
         glEnable(GL_LIGHT0);
         glLightModelfv(GL_LIGHT_MODEL_AMBIENT,black);
@@ -184,8 +195,14 @@ void ViewPort::paintGL()
         glEnable(GL_LIGHT1);
         glLightfv(GL_LIGHT1, GL_AMBIENT, black);
         glLightfv(GL_LIGHT1, GL_DIFFUSE, white);
-        glLightfv(GL_LIGHT0,GL_SPECULAR, black);
+        glLightfv(GL_LIGHT1, GL_SPECULAR, black);
         glLightfv(GL_LIGHT1, GL_POSITION, posS1);
+
+        glEnable(GL_LIGHT2);
+        glLightfv(GL_LIGHT2, GL_AMBIENT, black);
+        glLightfv(GL_LIGHT2, GL_DIFFUSE, white);
+        glLightfv(GL_LIGHT2, GL_SPECULAR, black);
+        glLightfv(GL_LIGHT2, GL_POSITION, origin);
 
         //    float solPos[] = {2,2,2};
         //    float solMot[] = {0.41,-3.1,0.0};
@@ -204,10 +221,19 @@ void ViewPort::paintGL()
         //            pointsVz[i] = -2.99e8 + (float)rand()/((float)2.99e8);
         //        }
 
+        glEnable(GL_POINT_SPRITE);
+        glBegin(GL_POINTS);
+        for (unsigned short int i = 1; i < nCloudPs; ++i)
+        {
+            glColor4f(1,1,1,0.1);
+            glVertex3f(cpX[i], cpY[i], cpZ[i]);
+        }
+        glEnd();
+
         glDisable(GL_LIGHTING);
         glEnable(GL_POINT_SPRITE);
         glBegin(GL_POINTS);
-        for(unsigned short int i = 1; i <= nPoints; i++)
+        for(unsigned short int i = 1; i < nPoints; i++)
         {
             //            double denom = pow(pointsX[i]*pointsX[i] + pointsY[i]*pointsY[i] + pointsZ[i]*pointsZ[i], 1.5);
             //            double ax = -G*nucleus->mass*(pointsX[i])/denom;
@@ -224,11 +250,12 @@ void ViewPort::paintGL()
 
             //            std::cout << pixel(pointsX[i], dim) << "\n";
             //            glVertex3f(pixel(pointsX[i], dim), 0, 0);
-            float zh = fmod(90*t,360.0);
-            float Position[]  = {pointsX[i]*cos(zh),0,pointsZ[i]*sin(zh)};
-            glColor3f(1,1,1);
-            pointsX[i] = Position[0];
-            pointsZ[i] = Position[2];
+//            float zh = fmod(90*t,360.0);
+//            float Position[]  = {pointsX[i]*cos(zh),0,pointsZ[i]*sin(zh)};
+            float r = i/nPoints;
+            glColor3f(r,1,1);
+//            pointsX[i] = Position[0];
+//            pointsZ[i] = Position[2];
             glVertex3f(pixel(pointsX[i], dim), pixel(pointsY[i], dim), pixel(pointsZ[i], dim));
         }
         glEnd();
