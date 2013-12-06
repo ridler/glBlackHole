@@ -1,6 +1,7 @@
 #include "viewport.h"
 #include <iostream>
 #include "mtrand.h"
+#include "helperFunctions.h"
 
 float inc = 0.001;
 int elapsed = 0;
@@ -13,7 +14,7 @@ float density = 0.25;
 float fogColor[4] = {0.5, 0.5, 0.5, 1.0};
 
 // main mode objects
-Star* s1 = new Star(8.33e10, 0, 0, 0, 0, 8.3e7, 37e8, 2e30);
+Star* s1 = new Star(8.33e10, 0, 0, 0, 0, 8.3e7, 4e9, 2e30);
 Star* s2 = new Star(0, 7.25e10, 0, 9.4e7, 0, 0, 20e8, 3e26);
 BlackHole* nucleus = new BlackHole(0,0,0,6.7e9,8.2e36);
 //ParticleSystem* ps1 = new ParticleSystem(300, 0, 3e5, 5e10);
@@ -25,15 +26,77 @@ BlackHole* bh2 = new BlackHole(2.2e11, -2.3e7, -5e9, -2e4, 0, 0, 5.6e9, 3.7e23);
 const unsigned short int nPoints = 10000;
 float pointsX[nPoints]; float pointsY[nPoints]; float pointsZ[nPoints];
 
-const unsigned short int nCloudPs = 100000;
+const unsigned short int nCloudPs = 10000;
 float cpX[nCloudPs]; float cpY[nCloudPs]; float cpZ[nCloudPs];
 
-static float pixel(float wx, unsigned short int dim)
+static void cube(float x, float y, float z,
+    float dx, float dy, float dz, unsigned int tex)
 {
-    int pmin = -dim; int pmax = dim;
-    float ratio = (pmax - pmin)/(wmax - wmin);
-    float result = (wx - wmin)*ratio + pmin;
-    return result;
+    glPushMatrix();
+
+    glTranslated(x,y,z);
+    glScaled(dx,dy,dz);
+
+    glEnable(GL_TEXTURE_2D);
+    //glTexEnvi(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,GL_MODULATE);
+   //	Front
+    glBindTexture(GL_TEXTURE_2D,tex);
+    glBegin(GL_QUADS);
+    glNormal3f( 0, 0, 1);
+    glTexCoord2f(0,0); glVertex3f(-1,-1, 1);
+    glTexCoord2f(1,0); glVertex3f(+1,-1, 1);
+    glTexCoord2f(1,1); glVertex3f(+1,+1, 1);
+    glTexCoord2f(0,1); glVertex3f(-1,+1, 1);
+    glEnd();
+   //	Back
+    glBindTexture(GL_TEXTURE_2D,tex);
+    glBegin(GL_QUADS);
+    glNormal3f( 0, 0,-1);
+    glTexCoord2f(0,0); glVertex3f(+1,-1,-1);
+    glTexCoord2f(1,0); glVertex3f(-1,-1,-1);
+    glTexCoord2f(1,1); glVertex3f(-1,+1,-1);
+    glTexCoord2f(0,1); glVertex3f(+1,+1,-1);
+    glEnd();
+   //  Right
+    glBindTexture(GL_TEXTURE_2D,tex);
+    glBegin(GL_QUADS);
+    glNormal3f(+1, 0, 0);
+    glTexCoord2f(0,0); glVertex3f(+1,-1,+1);
+    glTexCoord2f(1,0); glVertex3f(+1,-1,-1);
+    glTexCoord2f(1,1); glVertex3f(+1,+1,-1);
+    glTexCoord2f(0,1); glVertex3f(+1,+1,+1);
+    glEnd();
+   //  Left
+    glBindTexture(GL_TEXTURE_2D,tex);
+    glBegin(GL_QUADS);
+    glNormal3f(-1, 0, 0);
+    glTexCoord2f(0,0); glVertex3f(-1,-1,-1);
+    glTexCoord2f(1,0); glVertex3f(-1,-1,+1);
+    glTexCoord2f(1,1); glVertex3f(-1,+1,+1);
+    glTexCoord2f(0,1); glVertex3f(-1,+1,-1);
+    glEnd();
+   //  Top
+    glBindTexture(GL_TEXTURE_2D,tex);
+    glBegin(GL_QUADS);
+    glNormal3f( 0,+1, 0);
+    glTexCoord2f(0,0); glVertex3f(-1,+1,+1);
+    glTexCoord2f(1,0); glVertex3f(+1,+1,+1);
+    glTexCoord2f(1,1); glVertex3f(+1,+1,-1);
+    glTexCoord2f(0,1); glVertex3f(-1,+1,-1);
+    glEnd();
+
+    glDisable(GL_TEXTURE_2D);
+   //  Bottom
+    glBegin(GL_QUADS);
+    glNormal3f( 0,-1, 0);
+    glVertex3f(-1,-1,-1);
+    glVertex3f(+1,-1,-1);
+    glVertex3f(+1,-1,+1);
+    glVertex3f(-1,-1,+1);
+    glEnd();
+   //  Undo transformations and textures
+    glDisable(GL_TEXTURE_2D);
+    glPopMatrix();
 }
 
 static float world(int px, unsigned short int dim)
@@ -143,17 +206,10 @@ void ViewPort::paintGL()
     glColorMaterial(GL_FRONT_AND_BACK,GL_AMBIENT_AND_DIFFUSE);
     glEnable(GL_COLOR_MATERIAL);
 
-    //    glEnable(GL_FOG);
-    //    glFogi (GL_FOG_MODE, GL_LINEAR);
-    //    glFogfv (GL_FOG_COLOR, fogColor);
-    //    glFogf (GL_FOG_DENSITY, density);
-    //    glHint (GL_FOG_HINT, GL_NICEST);
-    //    glFogf(GL_FOG_START, 1.0);
-    //    glFogf(GL_FOG_END, 5.0);
-
     float black[]   = {0.0 , 0.0 , 0.0 , 1.0};
     float white[]   = {1.0 , 1.0 , 1.0 , 1.0};
-    // float red[]     = {0.5 , 0.2 , 0.2 , 1.0};
+    float red[]     = {0.5 , 0.2 , 0.2 , 1.0};
+    float blue[]    = {0.0 , 0.7 , 1.0 , 1.0};
 
     glRotated(th,0,0,1);
 
@@ -188,14 +244,14 @@ void ViewPort::paintGL()
         glEnable(GL_LIGHT0);
         glLightModelfv(GL_LIGHT_MODEL_AMBIENT,black);
         glLightfv(GL_LIGHT0,GL_AMBIENT ,black);
-        glLightfv(GL_LIGHT0,GL_DIFFUSE ,white);
+        glLightfv(GL_LIGHT0,GL_DIFFUSE ,blue);
         glLightfv(GL_LIGHT0,GL_SPECULAR,black);
         glLightfv(GL_LIGHT0,GL_POSITION,posS2);
 
         glEnable(GL_LIGHT1);
         glLightModelfv(GL_LIGHT_MODEL_AMBIENT,black);
         glLightfv(GL_LIGHT1, GL_AMBIENT, black);
-        glLightfv(GL_LIGHT1, GL_DIFFUSE, white);
+        glLightfv(GL_LIGHT1, GL_DIFFUSE, red);
         glLightfv(GL_LIGHT1, GL_SPECULAR, black);
         glLightfv(GL_LIGHT1, GL_POSITION, posS1);
 
@@ -215,20 +271,25 @@ void ViewPort::paintGL()
         }
         glEnd();
 
-        glDisable(GL_LIGHTING);
-        glEnable(GL_POINT_SPRITE);
-        glBegin(GL_POINTS);
+        //glDisable(GL_LIGHTING);
         for(unsigned short int i = 1; i < nPoints; i++)
         {
+            glTranslated(pixel(pointsX[i], dim), pixel(pointsY[i], dim), pixel(pointsZ[i], dim));
+            billboardBegin();
+            glEnable(GL_POINT_SPRITE);
+            glBegin(GL_POINTS);
             glColor3f(1,0.3,0.4);
-            glVertex3f(pixel(pointsX[i], dim), pixel(pointsY[i], dim), pixel(pointsZ[i], dim));
+            glVertex3f(0,0,0);
+            glPopMatrix();
+            glEnd();
         }
-        glEnd();
-        glEnable(GL_LIGHTING);
+        //glEnable(GL_LIGHTING);
+        glColor3f(1,1,1);
+        cube(0,0,12,2,2,2,0);
 
         nucleus->draw(t, NULL, merging, dim);
-        //s1->paint(t, nucleus, dim, textures[0]);
-        s2->paint(t, nucleus, dim, textures[0]);
+        s1->paint(t, nucleus, dim, textures[0]);
+        s2->paint(t, nucleus, dim, textures[1]);
     }
     glFlush();
 }

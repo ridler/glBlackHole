@@ -13,7 +13,8 @@ SOURCES += main.cpp\
     viewport.cpp \
     particlesystem.cpp \
     particle.cpp \
-    mtrand.cpp
+    mtrand.cpp \
+    helperFunctions.cpp
 
 HEADERS  += mainwindow.h \
     blackhole.h \
@@ -22,7 +23,8 @@ HEADERS  += mainwindow.h \
     viewport.h \
     particlesystem.h \
     particle.h \
-    mtrand.h
+    mtrand.h \
+    helperFunctions.h
 
 # The following is necessary to compile on my Linux version:
 LIBS += -L/usr/local/lib -lGLU
