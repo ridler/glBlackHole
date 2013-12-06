@@ -22,10 +22,10 @@ BlackHole* nucleus = new BlackHole(0,0,0,6.7e9,8.2e36);
 BlackHole* bh1 = new BlackHole(-4.8e10, 2.5e9, 2e5, 2e4, 0, 0, 3.2e9, 4.3e29);
 BlackHole* bh2 = new BlackHole(2.2e11, -2.3e7, -5e9, -2e4, 0, 0, 5.6e9, 3.7e23);
 
-const unsigned short int nPoints = 50000;
+const unsigned short int nPoints = 10000;
 float pointsX[nPoints]; float pointsY[nPoints]; float pointsZ[nPoints];
 
-const unsigned short int nCloudPs = 90000;
+const unsigned short int nCloudPs = 100000;
 float cpX[nCloudPs]; float cpY[nCloudPs]; float cpZ[nCloudPs];
 
 static float pixel(float wx, unsigned short int dim)
@@ -49,7 +49,7 @@ ViewPort::ViewPort(QWidget* parent)
 {
     th = ph = 0;      //  Set intial display angles
     asp = 1;           //  Aspect ratio
-    fov = 100;
+    fov = 50;
     mouse = 0;         //  Mouse movement
     dim = 10;
     merging = false;
@@ -193,39 +193,24 @@ void ViewPort::paintGL()
         glLightfv(GL_LIGHT0,GL_POSITION,posS2);
 
         glEnable(GL_LIGHT1);
+        glLightModelfv(GL_LIGHT_MODEL_AMBIENT,black);
         glLightfv(GL_LIGHT1, GL_AMBIENT, black);
         glLightfv(GL_LIGHT1, GL_DIFFUSE, white);
         glLightfv(GL_LIGHT1, GL_SPECULAR, black);
         glLightfv(GL_LIGHT1, GL_POSITION, posS1);
 
         glEnable(GL_LIGHT2);
+        glLightModelfv(GL_LIGHT_MODEL_AMBIENT,black);
         glLightfv(GL_LIGHT2, GL_AMBIENT, black);
         glLightfv(GL_LIGHT2, GL_DIFFUSE, white);
         glLightfv(GL_LIGHT2, GL_SPECULAR, black);
         glLightfv(GL_LIGHT2, GL_POSITION, origin);
 
-        //    float solPos[] = {2,2,2};
-        //    float solMot[] = {0.41,-3.1,0.0};
-        //    float solKep[] = {0.022770,1.753555,0.273978,5.2026,0.0014503019,0.0484646,5.629731};
-
-        //    float lunPos[] = {1.5,1.5,1.5};
-        //    float lunMot[] = {0.52,0.3,0.1};
-        //    float lunKep[] = {0.18770,0.923555,0.573978,4.8026,0.00214503019,0.00484646,3.829731};
-
-        //        float pointsVx[100]; float pointsVy[100]; float pointsVz[100];
-        //        float pointsX[100]; float pointsY[100]; float pointsZ[100];
-        //        for(unsigned char i = 0; i < 100; i++)
-        //        {
-        //            pointsVx[i] = -2.99e8 + (float)rand()/((float)2.99e8);
-        //            pointsVy[i] = -2.99e8 + (float)rand()/((float)2.99e8);
-        //            pointsVz[i] = -2.99e8 + (float)rand()/((float)2.99e8);
-        //        }
-
         glEnable(GL_POINT_SPRITE);
         glBegin(GL_POINTS);
         for (unsigned short int i = 1; i < nCloudPs; ++i)
         {
-            glColor4f(1,1,1,0.1);
+            glColor4f(1,1,1,1);
             glVertex3f(cpX[i], cpY[i], cpZ[i]);
         }
         glEnd();
@@ -235,36 +220,15 @@ void ViewPort::paintGL()
         glBegin(GL_POINTS);
         for(unsigned short int i = 1; i < nPoints; i++)
         {
-            //            double denom = pow(pointsX[i]*pointsX[i] + pointsY[i]*pointsY[i] + pointsZ[i]*pointsZ[i], 1.5);
-            //            double ax = -G*nucleus->mass*(pointsX[i])/denom;
-            //            double ay = -G*nucleus->mass*(pointsY[i])/denom;
-            //            double az = -G*nucleus->mass*(pointsZ[i])/denom;
-
-            //            pointsVx[i] += ax*t;
-            //            pointsVy[i] += ay*t;
-            //            pointsVz[i] += az*t;
-
-            //            pointsX[i] += pointsVx[i]*t;
-            //            pointsY[i] += pointsVy[i]*t;
-            //            pointsZ[i] += pointsVz[i]*t;
-
-            //            std::cout << pixel(pointsX[i], dim) << "\n";
-            //            glVertex3f(pixel(pointsX[i], dim), 0, 0);
-//            float zh = fmod(90*t,360.0);
-//            float Position[]  = {pointsX[i]*cos(zh),0,pointsZ[i]*sin(zh)};
-            float r = i/nPoints;
-            glColor3f(r,1,1);
-//            pointsX[i] = Position[0];
-//            pointsZ[i] = Position[2];
+            glColor3f(1,0.3,0.4);
             glVertex3f(pixel(pointsX[i], dim), pixel(pointsY[i], dim), pixel(pointsZ[i], dim));
         }
         glEnd();
         glEnable(GL_LIGHTING);
 
         nucleus->draw(t, NULL, merging, dim);
-        s1->paint(t, nucleus, dim, textures[0]);
-        s2->paint(t, nucleus, dim, 0);
-        //ps1->update(t, nucleus, dim);
+        //s1->paint(t, nucleus, dim, textures[0]);
+        s2->paint(t, nucleus, dim, textures[0]);
     }
     glFlush();
 }
@@ -301,7 +265,7 @@ void ViewPort::wheelEvent(QWheelEvent* e)
 
 void ViewPort::genTex()
 {
-    for (unsigned char j=0; j < 2; ++j)
+    for (unsigned char j=0; j < nTex; ++j)
     {
         textures[j] = bindTexture
                 (QPixmap(QString(":textures/tex%1.png").arg(j + 1)), GL_TEXTURE_2D);

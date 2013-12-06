@@ -1,0 +1,6 @@
+ <!DOCTYPE RCC><RCC version="1.0">
+ <qresource>
+     <file>textures/tex1.png</file>
+     <file>textures/tex2.png</file>
+ </qresource>
+ </RCC>

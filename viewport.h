@@ -13,6 +13,8 @@
 #include <GL/glut.h>
 #endif
 
+#define nTex 2
+
 class ViewPort : public QGLWidget
 {
     Q_OBJECT
@@ -23,7 +25,7 @@ private:
     double asp;       //  Sceen aspect ratio
     double fov;       //  field of view
     bool merging;     //  switches modes
-    unsigned int textures[2];
+    unsigned int textures[nTex];
     void genTex();
     void project();
     QTimer animationTimer;

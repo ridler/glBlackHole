@@ -26,3 +26,6 @@ HEADERS  += mainwindow.h \
 
 # The following is necessary to compile on my Linux version:
 LIBS += -L/usr/local/lib -lGLU
+
+RESOURCES += \
+    textures.qrc
