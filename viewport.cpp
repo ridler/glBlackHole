@@ -14,8 +14,9 @@ float density = 0.25;
 float fogColor[4] = {0.5, 0.5, 0.5, 1.0};
 
 // main mode objects
-Star* s1 = new Star(8.33e10, 0, 0, 0, 0, 8.3e7, 4e9, 2e30);
+Star* s1 = new Star(8.33e10, 0, 0, 0, 0, 8.3e7, 4e10, 2e30);
 Star* s2 = new Star(0, 7.25e10, 0, 9.4e7, 0, 0, 20e8, 3e26);
+Star* s3 = new Star(-7e10,3e8,0, 2e6,3e5,9e7, 8.1e7, 3e30);
 BlackHole* nucleus = new BlackHole(0,0,0,6.7e9,8.2e36);
 //ParticleSystem* ps1 = new ParticleSystem(300, 0, 3e5, 5e10);
 
@@ -29,93 +30,17 @@ float pointsX[nPoints]; float pointsY[nPoints]; float pointsZ[nPoints];
 const unsigned short int nCloudPs = 10000;
 float cpX[nCloudPs]; float cpY[nCloudPs]; float cpZ[nCloudPs];
 
-static void cube(float x, float y, float z,
-    float dx, float dy, float dz, unsigned int tex)
-{
-    glPushMatrix();
-
-    glTranslated(x,y,z);
-    glScaled(dx,dy,dz);
-
-    glEnable(GL_TEXTURE_2D);
-    //glTexEnvi(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,GL_MODULATE);
-   //	Front
-    glBindTexture(GL_TEXTURE_2D,tex);
-    glBegin(GL_QUADS);
-    glNormal3f( 0, 0, 1);
-    glTexCoord2f(0,0); glVertex3f(-1,-1, 1);
-    glTexCoord2f(1,0); glVertex3f(+1,-1, 1);
-    glTexCoord2f(1,1); glVertex3f(+1,+1, 1);
-    glTexCoord2f(0,1); glVertex3f(-1,+1, 1);
-    glEnd();
-   //	Back
-    glBindTexture(GL_TEXTURE_2D,tex);
-    glBegin(GL_QUADS);
-    glNormal3f( 0, 0,-1);
-    glTexCoord2f(0,0); glVertex3f(+1,-1,-1);
-    glTexCoord2f(1,0); glVertex3f(-1,-1,-1);
-    glTexCoord2f(1,1); glVertex3f(-1,+1,-1);
-    glTexCoord2f(0,1); glVertex3f(+1,+1,-1);
-    glEnd();
-   //  Right
-    glBindTexture(GL_TEXTURE_2D,tex);
-    glBegin(GL_QUADS);
-    glNormal3f(+1, 0, 0);
-    glTexCoord2f(0,0); glVertex3f(+1,-1,+1);
-    glTexCoord2f(1,0); glVertex3f(+1,-1,-1);
-    glTexCoord2f(1,1); glVertex3f(+1,+1,-1);
-    glTexCoord2f(0,1); glVertex3f(+1,+1,+1);
-    glEnd();
-   //  Left
-    glBindTexture(GL_TEXTURE_2D,tex);
-    glBegin(GL_QUADS);
-    glNormal3f(-1, 0, 0);
-    glTexCoord2f(0,0); glVertex3f(-1,-1,-1);
-    glTexCoord2f(1,0); glVertex3f(-1,-1,+1);
-    glTexCoord2f(1,1); glVertex3f(-1,+1,+1);
-    glTexCoord2f(0,1); glVertex3f(-1,+1,-1);
-    glEnd();
-   //  Top
-    glBindTexture(GL_TEXTURE_2D,tex);
-    glBegin(GL_QUADS);
-    glNormal3f( 0,+1, 0);
-    glTexCoord2f(0,0); glVertex3f(-1,+1,+1);
-    glTexCoord2f(1,0); glVertex3f(+1,+1,+1);
-    glTexCoord2f(1,1); glVertex3f(+1,+1,-1);
-    glTexCoord2f(0,1); glVertex3f(-1,+1,-1);
-    glEnd();
-
-    glDisable(GL_TEXTURE_2D);
-   //  Bottom
-    glBegin(GL_QUADS);
-    glNormal3f( 0,-1, 0);
-    glVertex3f(-1,-1,-1);
-    glVertex3f(+1,-1,-1);
-    glVertex3f(+1,-1,+1);
-    glVertex3f(-1,-1,+1);
-    glEnd();
-   //  Undo transformations and textures
-    glDisable(GL_TEXTURE_2D);
-    glPopMatrix();
-}
-
-static float world(int px, unsigned short int dim)
-{
-    float pmin = -dim; float pmax = dim;
-    double wx;
-    wx = wmin + ((wmax - wmin)/(pmax - pmin))*(px - pmin);
-    return wx;
-}
-
 ViewPort::ViewPort(QWidget* parent)
     : QGLWidget(parent)
 {
-    th = ph = 0;      //  Set intial display angles
+    th = 0;
+    ph = 10;      //  Set intial display angles
     asp = 1;           //  Aspect ratio
-    fov = 50;
+    fov = 80;
     mouse = 0;         //  Mouse movement
     dim = 10;
     merging = false;
+    cubes = true;
     DIM = dim;
 
     animationTimer.setSingleShot(false);
@@ -188,6 +113,8 @@ void ViewPort::beginMerge()
     merging = true; fov += 25; updateGL();
 }
 
+void ViewPort::toggleCubes() { cubes = !cubes; }
+
 void ViewPort::paintGL()
 {
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
@@ -212,6 +139,17 @@ void ViewPort::paintGL()
     float blue[]    = {0.0 , 0.7 , 1.0 , 1.0};
 
     glRotated(th,0,0,1);
+
+    glEnable(GL_POINT_SPRITE);
+    glBegin(GL_POINTS);
+    for (unsigned short int i = 1; i < nCloudPs; ++i)
+    {
+        glColor4f(1,1,1,1);
+        glNormal3f(-Ex, -Ey, -Ez);
+        glVertex3f(cpX[i], cpY[i], cpZ[i]);
+    }
+    glEnd();
+    glDisable(GL_POINT_SPRITE);
 
     if (merging)
     {
@@ -239,7 +177,8 @@ void ViewPort::paintGL()
     {
         float posS2[]   = {s2->x, s2->y, s2->z, 1.0};
         float posS1[]   = {s1->x, s1->y, s1->z, 1.0};
-        float origin[] = {0,0,0,1};
+        float posS3[]   = {s3->x, s3->y, s3->z, 1.0};
+        float origin[]  = {0,0,0,1};
 
         glEnable(GL_LIGHT0);
         glLightModelfv(GL_LIGHT_MODEL_AMBIENT,black);
@@ -262,34 +201,38 @@ void ViewPort::paintGL()
         glLightfv(GL_LIGHT2, GL_SPECULAR, black);
         glLightfv(GL_LIGHT2, GL_POSITION, origin);
 
+        glEnable(GL_LIGHT3);
+        glLightModelfv(GL_LIGHT_MODEL_AMBIENT,black);
+        glLightfv(GL_LIGHT2, GL_AMBIENT, black);
+        glLightfv(GL_LIGHT2, GL_DIFFUSE, white);
+        glLightfv(GL_LIGHT2, GL_SPECULAR, black);
+        glLightfv(GL_LIGHT2, GL_POSITION, posS3);
+
+        glDisable(GL_LIGHTING);
         glEnable(GL_POINT_SPRITE);
         glBegin(GL_POINTS);
-        for (unsigned short int i = 1; i < nCloudPs; ++i)
-        {
-            glColor4f(1,1,1,1);
-            glVertex3f(cpX[i], cpY[i], cpZ[i]);
-        }
-        glEnd();
-
-        //glDisable(GL_LIGHTING);
         for(unsigned short int i = 1; i < nPoints; i++)
         {
-            glTranslated(pixel(pointsX[i], dim), pixel(pointsY[i], dim), pixel(pointsZ[i], dim));
-            billboardBegin();
-            glEnable(GL_POINT_SPRITE);
-            glBegin(GL_POINTS);
-            glColor3f(1,0.3,0.4);
-            glVertex3f(0,0,0);
-            glPopMatrix();
-            glEnd();
+            glColor3f(1,1,1);
+            glVertex3f(pixel(pointsX[i], dim), pixel(pointsY[i], dim), pixel(pointsZ[i], dim));
         }
-        //glEnable(GL_LIGHTING);
-        glColor3f(1,1,1);
-        cube(0,0,12,2,2,2,0);
+        glEnd();
+        glDisable(GL_POINT_SPRITE);
+        glEnable(GL_LIGHTING);
+
+        if(cubes)
+        {
+            glColor3f(1,1,1);
+            glPushMatrix();
+            glRotated(45, 1,1,1);
+            cube(-10,10,2,1,1,1,0);
+            glPopMatrix();
+        }
 
         nucleus->draw(t, NULL, merging, dim);
         s1->paint(t, nucleus, dim, textures[0]);
         s2->paint(t, nucleus, dim, textures[1]);
+        s3->paint(t, nucleus, dim, textures[2]);
     }
     glFlush();
 }

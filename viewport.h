@@ -13,7 +13,7 @@
 #include <GL/glut.h>
 #endif
 
-#define nTex 2
+#define nTex 3
 
 class ViewPort : public QGLWidget
 {
@@ -25,6 +25,7 @@ private:
     double asp;       //  Sceen aspect ratio
     double fov;       //  field of view
     bool merging;     //  switches modes
+    bool cubes;       //  toggle cubes
     unsigned int textures[nTex];
     void genTex();
     void project();
@@ -38,6 +39,7 @@ public:
 public slots:
     void reset(void);           // Reset view
     void beginMerge(void);      // Switch modes
+    void toggleCubes(void);
 private slots:
     void animate();
 

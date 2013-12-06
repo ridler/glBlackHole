@@ -30,7 +30,6 @@ static void bhVertex(int th,int ph)
     float x = -Sin(th)*Cos(ph);
     float y =  Cos(th)*Cos(ph);
     float z =          Sin(ph);
-    glNormal3f(x, y, z);
     glVertex3f(x,y,z);
 }
 

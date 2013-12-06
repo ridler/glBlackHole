@@ -9,10 +9,12 @@ MainWindow::MainWindow(QWidget* parent)
 
    QPushButton* reset = new QPushButton("Reset");
    QPushButton* merge = new QPushButton("Begin Merger");
+   QPushButton* cubes = new QPushButton("Toggle Cubes");
 
    //  Connect signals to slots
    connect(reset, SIGNAL(clicked(void)), galaxy, SLOT(reset(void)));
    connect(merge, SIGNAL(clicked(void)), galaxy, SLOT(beginMerge(void)));
+   connect(cubes, SIGNAL(clicked(void)), galaxy, SLOT(cubes(void)));
 
    //  Set layout of child widgets
    QGridLayout* layout = new QGridLayout;
@@ -27,6 +29,7 @@ MainWindow::MainWindow(QWidget* parent)
    QGridLayout* dsplay = new QGridLayout;
    dsplay->addWidget(reset,2,1);
    dsplay->addWidget(merge,3,1);
+   dsplay->addWidget(cubes,4,1);
    dspbox->setLayout(dsplay);
    layout->addWidget(dspbox,2,1);
 

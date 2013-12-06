@@ -2,5 +2,6 @@
  <qresource>
      <file>textures/tex1.png</file>
      <file>textures/tex2.png</file>
+     <file>textures/tex3.png</file>
  </qresource>
  </RCC>
