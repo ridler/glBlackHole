@@ -113,7 +113,10 @@ void ViewPort::beginMerge()
     merging = true; fov += 25; updateGL();
 }
 
-void ViewPort::toggleCubes() { cubes = !cubes; }
+void ViewPort::toggleCubes() { cubes = !cubes; updateGL(); }
+
+void ViewPort::slideInc()
+{ return; }
 
 void ViewPort::paintGL()
 {
@@ -223,10 +226,13 @@ void ViewPort::paintGL()
         if(cubes)
         {
             glColor3f(1,1,1);
-            glPushMatrix();
-            glRotated(45, 1,1,1);
-            cube(-10,10,2,1,1,1,0);
-            glPopMatrix();
+            for(char i = 1; i <= 5; ++i)
+            {
+                glPushMatrix();
+                glRotated(i*20, 1,1,1);
+                cube(10*pow(-1,i),6/i,10*pow(-1,i), 0.5,0.5,0.5, 0);
+                glPopMatrix();
+            }
         }
 
         nucleus->draw(t, NULL, merging, dim);

@@ -1,5 +1,6 @@
 #include "blackhole.h"
 #include "helpers.h"
+#include "helperFunctions.h"
 
 BlackHole::BlackHole(float x, float y, float z, float R, double mass)
 {
@@ -16,15 +17,6 @@ BlackHole::BlackHole(float x, float y, float z, float v0x, float v0y, float v0z,
     this->R = R; this->mass = mass;
 }
 
-// convert from real coordinates to screen coordinates
-static float pixel(float wx, unsigned short int dim)
-{
-    int pmin = -dim; int pmax = dim;
-    float ratio = (pmax - pmin)/(wmax - wmin);
-    float result = (wx - wmin)*ratio + pmin;
-    return result;
-}
-
 static void bhVertex(int th,int ph)
 {
     float x = -Sin(th)*Cos(ph);
@@ -33,15 +25,29 @@ static void bhVertex(int th,int ph)
     glVertex3f(x,y,z);
 }
 
+static void bhSphere()
+{
+    short int th,ph;
+    for (ph=-90;ph<90;ph+=5)
+    {
+        glBegin(GL_QUAD_STRIP);
+        for (th=0;th<=360;th+=5)
+        {
+            bhVertex(th,ph);
+            bhVertex(th,ph+5);
+        }
+        glEnd();
+    }
+}
+
 void BlackHole::draw(float t, BlackHole* bh, bool mergeMode, unsigned short int dim)
 {
-    glDisable(GL_LIGHTING);
     if (mergeMode)
     {
-//        double dx = (sx - x);
-//        double dy = (sy - y);
-//        double denominator = pow(dx*dx + dy*dy, 1.5);
-//        return G*m*dx/denominator;
+        //        double dx = (sx - x);
+        //        double dy = (sy - y);
+        //        double denominator = pow(dx*dx + dy*dy, 1.5);
+        //        return G*m*dx/denominator;
 
         //float r  = pow(pow(this->x - bh->x, 2) + pow(this->y - bh->y) + pow(this->z - bh->z), 0.5);
 
@@ -53,10 +59,10 @@ void BlackHole::draw(float t, BlackHole* bh, bool mergeMode, unsigned short int 
         float ay = -G*M/(ry*ry);
         float az = -G*M/(rz*rz);
 
-//        double denom = pow(x*x + y*y + z*z, 1.5);
-//        double ax = G*M*(rx)/denom;
-//        double ay = G*M*(ry)/denom;
-//        double az = G*M*(rz)/denom;
+        //        double denom = pow(x*x + y*y + z*z, 1.5);
+        //        double ax = G*M*(rx)/denom;
+        //        double ay = G*M*(ry)/denom;
+        //        double az = G*M*(rz)/denom;
 
         this->vx += ax*t;
         this->vy += ay*t;
@@ -71,24 +77,18 @@ void BlackHole::draw(float t, BlackHole* bh, bool mergeMode, unsigned short int 
         this->z += az*t*t + this->vz*t;
     }
 
+
     float rP = pixel(R, dim);
     float xP = pixel(x, dim); float yP = pixel(y, dim); float zP = pixel(z, dim);
-    int th,ph;
 
+    glDisable(GL_LIGHTING);
+    glPushMatrix();
     glTranslated(xP, yP, zP);
-
     glScaled(rP, rP, rP);
-    glColor3f(0,0,0);
-    for (ph=-90;ph<90;ph+=5)
-    {
-        glBegin(GL_QUAD_STRIP);
-        for (th=0;th<=360;th+=5)
-        {
-            bhVertex(th,ph);
-            bhVertex(th,ph+5);
-        }
-        glEnd();
-    }
-   glEnable(GL_LIGHTING);
-   glColor3f(1,1,0);
+    if(mergeMode) { glColor3f(0,1,1); }
+    else { glColor3f(0,0,0); }
+    bhSphere();
+    glPopMatrix();
+    glEnable(GL_LIGHTING);
+    glColor3f(1,1,0);
 }
