@@ -101,7 +101,7 @@ void ViewPort::animate()
 
 void ViewPort::reset(void)
 {
-    th = ph = 0;
+    th = ph = 15;
     t = 0; elapsed = 0;
     merging = false;
     fov -= 25;
@@ -110,7 +110,8 @@ void ViewPort::reset(void)
 
 void ViewPort::beginMerge()
 {
-    merging = true; fov += 25; updateGL();
+    merging = true; fov += 25;
+    inc = 0.1; updateGL();
 }
 
 void ViewPort::toggleCubes() { cubes = !cubes; updateGL(); }
@@ -128,8 +129,8 @@ void ViewPort::paintGL()
     float Ez = +2*dim*Cos(th)*Cos(ph);
     gluLookAt(Ex,Ey,Ez , 0,0,0 , 0,Cos(ph),0);
 
-    for (unsigned char i = 0; i < 2; ++i) {
-        glBindTexture(GL_TEXTURE_2D, textures[i]); }
+    for (unsigned char i = 0; i < nTex; ++i)
+    { glBindTexture(GL_TEXTURE_2D, textures[i]); }
 
     glEnable(GL_NORMALIZE);
     glEnable(GL_LIGHTING);
@@ -226,7 +227,7 @@ void ViewPort::paintGL()
         if(cubes)
         {
             glColor3f(1,1,1);
-            for(char i = 1; i <= 5; ++i)
+            for(char i = 1; i <= 6; ++i)
             {
                 glPushMatrix();
                 glRotated(i*20, 1,1,1);
