@@ -14,11 +14,18 @@ float density = 0.25;
 float fogColor[4] = {0.5, 0.5, 0.5, 1.0};
 
 // main mode objects
+float s1_pos[] = { 8.33e10, 0, 0 };
+float s1_vel[] = { 0, 0, 8.37 };
+float s2_pos[] = { 0, 7.25e10, 0 };
+float s2_vel[] = { 9.4e7, 0, 0 };
+float s3_pos[] = { -7e10, 3e8, 0 };
+float s3_vel[] = { 2e6, 3e5, 9e7 };
+
 Star* s1 = new Star(8.33e10, 0, 0, 0, 0, 8.3e7, 4e10, 2e30);
 Star* s2 = new Star(0, 7.25e10, 0, 9.4e7, 0, 0, 20e8, 3e26);
 Star* s3 = new Star(-7e10,3e8,0, 2e6,3e5,9e7, 8.1e7, 3e30);
 BlackHole* nucleus = new BlackHole(0,0,0,6.7e9,8.2e36);
-BlackHole* intrude = new BlackHole(6e12, 3e4, -2e5, -2e4, 0, 0, 4.6e9, 5.9e29);
+BlackHole* intrude = new BlackHole(4e11, 3e4, -2e5, -2e4, -3e3, -2e7, 4.6e9, 5.9e35);
 //ParticleSystem* ps1 = new ParticleSystem(300, 0, 3e5, 5e10);
 
 // merge mode objects
@@ -34,8 +41,7 @@ float cpX[nCloudPs]; float cpY[nCloudPs]; float cpZ[nCloudPs];
 ViewPort::ViewPort(QWidget* parent)
     : QGLWidget(parent)
 {
-    th = 0;
-    ph = 10;      //  Set intial display angles
+    th = ph = 15;
     asp = 1;           //  Aspect ratio
     fov = 80;
     mouse = 0;         //  Mouse movement
@@ -105,14 +111,14 @@ void ViewPort::reset(void)
     th = ph = 15;
     t = 0; elapsed = 0;
     merging = false;
-    fov -= 25;
+    fov += 25;
     updateGL();
 }
 
 void ViewPort::beginMerge()
 {
-    merging = true; fov += 25;
-    inc = 0.1; updateGL();
+    merging = true; fov -= 25;
+    inc = 0.001; updateGL();
 }
 
 void ViewPort::toggleCubes() { cubes = !cubes; updateGL(); }
@@ -130,6 +136,13 @@ static void explodePoints()
             pointsX[i] += -pointsX[i]*exV*t;
             pointsY[i] += -pointsY[i]*exV*t;
             pointsZ[i] += -pointsZ[i]*exV*t;
+            glDisable(GL_LIGHTING);
+            glEnable(GL_POINT_SPRITE);
+            glBegin(GL_POINTS);
+            glVertex3f(pixel(pointsX[i], DIM), pixel(pointsY[i], DIM), pixel(pointsZ[i], DIM));
+            glEnd();
+            glDisable(GL_POINT_SPRITE);
+            glEnable(GL_LIGHTING);
         }
     }
 }
@@ -170,31 +183,31 @@ void ViewPort::paintGL()
     glEnd();
     glDisable(GL_POINT_SPRITE);
 
-    if (merging)
-    {
-        float posIntrude[] = { intrude->x, intrude->y, intrude->z };
-        float posNucleus[] = { nucleus->x, nucleus->y, nucleus->z };
+//    if (merging)
+//    {
+//        float posIntrude[] = { intrude->x, intrude->y, intrude->z };
+//        float posNucleus[] = { nucleus->x, nucleus->y, nucleus->z };
 
-        glEnable(GL_LIGHT0);
-        glLightModelfv(GL_LIGHT_MODEL_AMBIENT,black);
-        glLightfv(GL_LIGHT0,GL_AMBIENT ,black);
-        glLightfv(GL_LIGHT0,GL_DIFFUSE ,white);
-        glLightfv(GL_LIGHT0,GL_SPECULAR,black);
-        glLightfv(GL_LIGHT0,GL_POSITION,posIntrude);
+//        glEnable(GL_LIGHT0);
+//        glLightModelfv(GL_LIGHT_MODEL_AMBIENT,black);
+//        glLightfv(GL_LIGHT0,GL_AMBIENT ,black);
+//        glLightfv(GL_LIGHT0,GL_DIFFUSE ,white);
+//        glLightfv(GL_LIGHT0,GL_SPECULAR,black);
+//        glLightfv(GL_LIGHT0,GL_POSITION,posIntrude);
 
-        glEnable(GL_LIGHT1);
-        glLightfv(GL_LIGHT1, GL_AMBIENT, black);
-        glLightfv(GL_LIGHT1, GL_DIFFUSE, white);
-        glLightfv(GL_LIGHT0, GL_SPECULAR, black);
-        glLightfv(GL_LIGHT1, GL_POSITION, posNucleus);
+//        glEnable(GL_LIGHT1);
+//        glLightfv(GL_LIGHT1, GL_AMBIENT, black);
+//        glLightfv(GL_LIGHT1, GL_DIFFUSE, white);
+//        glLightfv(GL_LIGHT0, GL_SPECULAR, black);
+//        glLightfv(GL_LIGHT1, GL_POSITION, posNucleus);
 
-        intrude->draw(t, nucleus, merging, dim);
-        nucleus->draw(t, intrude, merging, dim);
-        //explodePoints();
-    }
+//        intrude->draw(t, nucleus, merging, dim);
+//        nucleus->draw(t, intrude, merging, dim);
+//        //explodePoints();
+//    }
 
-    else
-    {
+//    else
+//    {
         float posS2[]   = {s2->x, s2->y, s2->z, 1.0};
         float posS1[]   = {s1->x, s1->y, s1->z, 1.0};
         float posS3[]   = {s3->x, s3->y, s3->z, 1.0};
@@ -252,11 +265,17 @@ void ViewPort::paintGL()
             }
         }
 
-        nucleus->draw(t, NULL, merging, dim);
+        if(merging)
+        {
+            nucleus->draw(t, intrude, merging, dim);
+            intrude->draw(t, nucleus, merging, dim);
+            //std::cout << nucleus->x << "\n";
+        }
+        else { nucleus->draw(t, NULL, merging, dim); }
         s1->paint(t, nucleus, dim, textures[0]);
         s2->paint(t, nucleus, dim, textures[1]);
         s3->paint(t, nucleus, dim, textures[2]);
-    }
+//    }
 
     glFlush();
 }

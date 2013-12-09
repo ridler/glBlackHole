@@ -44,25 +44,19 @@ void BlackHole::draw(float t, BlackHole* bh, bool mergeMode, unsigned short int 
 {
     if (mergeMode)
     {
-        //        double dx = (sx - x);
-        //        double dy = (sy - y);
-        //        double denominator = pow(dx*dx + dy*dy, 1.5);
-        //        return G*m*dx/denominator;
-
-        //float r  = pow(pow(this->x - bh->x, 2) + pow(this->y - bh->y) + pow(this->z - bh->z), 0.5);
-
         float rx = bh->x - this->x;
         float ry = bh->y - this->y;
         float rz = bh->z - this->z;
-        float M = bh->mass;
-        float ax = -G*M/(rx*rx);
-        float ay = -G*M/(ry*ry);
-        float az = -G*M/(rz*rz);
 
-        //        double denom = pow(x*x + y*y + z*z, 1.5);
-        //        double ax = G*M*(rx)/denom;
-        //        double ay = G*M*(ry)/denom;
-        //        double az = G*M*(rz)/denom;
+//        if(rx <= bh->R && ry <= bh->R && rz <= bh->R)
+//        { return; }
+
+        float M = bh->mass;
+
+        double denom = pow(rx*rx + ry*ry + rz*rz, 1.5);
+        double ax = G*M*(rx)/denom;
+        double ay = G*M*(ry)/denom;
+        double az = G*M*(rz)/denom;
 
         this->vx += ax*t;
         this->vy += ay*t;
@@ -72,14 +66,16 @@ void BlackHole::draw(float t, BlackHole* bh, bool mergeMode, unsigned short int 
         vy > 3e8 ? vy = 3e8 : vy = vy;
         vz > 3e8 ? vz = 3e8 : vz = vz;
 
-        this->x += ax*t*t + this->vx*t;
-        this->y += ay*t*t + this->vy*t;
-        this->z += az*t*t + this->vz*t;
+        this->x += this->vx*t;
+        this->y += this->vy*t;
+        this->z += this->vz*t;
     }
 
 
     float rP = pixel(R, dim);
-    float xP = pixel(x, dim); float yP = pixel(y, dim); float zP = pixel(z, dim);
+    float xP = pixel(x, dim);
+    float yP = pixel(y, dim);
+    float zP = pixel(z, dim);
 
     glDisable(GL_LIGHTING);
     glPushMatrix();
@@ -90,5 +86,4 @@ void BlackHole::draw(float t, BlackHole* bh, bool mergeMode, unsigned short int 
     bhSphere();
     glPopMatrix();
     glEnable(GL_LIGHTING);
-    glColor3f(1,1,0);
 }
