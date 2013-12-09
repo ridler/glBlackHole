@@ -2,18 +2,17 @@
 #include "helpers.h"
 #include "helperFunctions.h"
 
-BlackHole::BlackHole(float x, float y, float z, float R, double mass)
+BlackHole::BlackHole(float pos[], float R, double mass)
 {
-    this->x = x; this->y = y; this->z = z;
+    this->x = pos[0]; this->y = pos[1]; this->z = pos[2];
     this->R = R; this->mass = mass;
     vx = vy = vz = 0;
 }
 
-BlackHole::BlackHole(float x, float y, float z, float v0x, float v0y, float v0z,
-                     float R, double mass)
+BlackHole::BlackHole(float pos[], float vel[], float R, double mass)
 {
-    vx = v0x; vy = v0y; vz = v0z;
-    this->x = x; this->y = y; this->z = z;
+    vx = vel[0]; vy = vel[1]; vz = vel[2];
+    this->x = pos[0]; this->y = pos[1]; this->z = pos[2];
     this->R = R; this->mass = mass;
 }
 

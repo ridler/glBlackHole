@@ -40,7 +40,6 @@ public slots:
     void reset(void);           // Reset view
     void beginMerge(void);      // Switch modes
     void toggleCubes(void);
-    void slideInc(void);
 
 private slots:
     void animate();

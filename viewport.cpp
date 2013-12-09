@@ -8,29 +8,33 @@ int elapsed = 0;
 float t = 0;
 
 unsigned short int DIM = 10;
-int psX, psY = 0;
+//int psX, psY = 0;
 
-float density = 0.25;
-float fogColor[4] = {0.5, 0.5, 0.5, 1.0};
-
-// main mode objects
+float s1R = 4e10; float s1M = 2e30;
 float s1_pos[] = { 8.33e10, 0, 0 };
-float s1_vel[] = { 0, 0, 8.37 };
+float s1_vel[] = { 0, 0, 8.3e7 };
+
+float s2R = 20e8; float s2M = 3e26;
 float s2_pos[] = { 0, 7.25e10, 0 };
 float s2_vel[] = { 9.4e7, 0, 0 };
+
+float s3R = 8.1e7; float s3M = 3e30;
 float s3_pos[] = { -7e10, 3e8, 0 };
 float s3_vel[] = { 2e6, 3e5, 9e7 };
 
-Star* s1 = new Star(8.33e10, 0, 0, 0, 0, 8.3e7, 4e10, 2e30);
-Star* s2 = new Star(0, 7.25e10, 0, 9.4e7, 0, 0, 20e8, 3e26);
-Star* s3 = new Star(-7e10,3e8,0, 2e6,3e5,9e7, 8.1e7, 3e30);
-BlackHole* nucleus = new BlackHole(0,0,0,6.7e9,8.2e36);
-BlackHole* intrude = new BlackHole(4e11, 3e4, -2e5, -2e4, -3e3, -2e7, 4.6e9, 5.9e35);
-//ParticleSystem* ps1 = new ParticleSystem(300, 0, 3e5, 5e10);
+Star* s1 = new Star(s1_pos, s1_vel, s1R, s1M);
+Star* s2 = new Star(s2_pos, s2_vel, s2R, s2M);
+Star* s3 = new Star(s3_pos, s3_vel, s3R, s3M);
 
-// merge mode objects
-//BlackHole* bh1 = new BlackHole(-4.8e10, 2.5e9, 2e5, 2e4, 0, 0, 3.2e9, 4.3e29);
-//BlackHole* bh2 = new BlackHole(2.2e11, -2.3e7, -5e9, -2e4, 0, 0, 5.6e9, 3.7e23);
+float nucleus_pos[] = { 0, 0, 0 };
+float nucleusR = 6.7e9; float nucleusM = 8.2e36;
+
+float intrude_pos[] = { 4e11, 3e4, -2e5 };
+float intrude_vel[] = { -2e4, -3e3, -2e7 };
+float intrudeR = 4.6e9; float intrudeM = 5.9e35;
+
+BlackHole* nucleus = new BlackHole(nucleus_pos, nucleusR, nucleusM);
+BlackHole* intrude = new BlackHole(intrude_pos, intrude_vel, intrudeR, intrudeM);
 
 const unsigned short int nPoints = 10000;
 float pointsX[nPoints]; float pointsY[nPoints]; float pointsZ[nPoints];
@@ -108,44 +112,36 @@ void ViewPort::animate()
 
 void ViewPort::reset(void)
 {
-    th = ph = 15;
+    th = ph = 15; fov = 80;
     t = 0; elapsed = 0;
     merging = false;
-    fov += 25;
+
+    s1->x = s1_pos[0]; s1->y = s1_pos[1]; s1->z = s1_pos[2];
+    s2->x = s2_pos[0]; s2->y = s2_pos[1]; s2->z = s2_pos[2];
+    s3->x = s3_pos[0]; s3->y = s3_pos[1]; s3->z = s3_pos[2];
+
+    s1->vx = s1_vel[0]; s1->vy = s1_vel[1]; s1->vz = s1_vel[2];
+    s2->vx = s2_vel[0]; s2->vy = s2_vel[1]; s2->vz = s2_vel[2];
+    s3->vx = s3_vel[0]; s3->vy = s3_vel[1]; s3->vz = s3_vel[2];
+
+    nucleus->x = nucleus_pos[0]; nucleus->y = nucleus_pos[1]; nucleus->z = nucleus_pos[2];
+    intrude->x = intrude_pos[0]; intrude->y = intrude_pos[1]; intrude->z = intrude_pos[2];
+
+    nucleus->vx = nucleus->vy = nucleus->vz = 0;
+    intrude->vx = intrude_vel[0]; intrude->vy = intrude_vel[1]; intrude->vz = intrude_vel[2];
+
     updateGL();
 }
 
 void ViewPort::beginMerge()
 {
-    merging = true; fov -= 25;
-    inc = 0.001; updateGL();
+    merging = true; cubes = false;
+    fov -= 25;
+    inc = 0.001;
+    updateGL();
 }
 
 void ViewPort::toggleCubes() { cubes = !cubes; updateGL(); }
-
-void ViewPort::slideInc()
-{ return; }
-
-static void explodePoints()
-{
-    float exV = 2.7e8;
-    for(unsigned char it = 1; it <= 10; ++it)
-    {
-        for(unsigned short int i = 0; i < nPoints; ++i)
-        {
-            pointsX[i] += -pointsX[i]*exV*t;
-            pointsY[i] += -pointsY[i]*exV*t;
-            pointsZ[i] += -pointsZ[i]*exV*t;
-            glDisable(GL_LIGHTING);
-            glEnable(GL_POINT_SPRITE);
-            glBegin(GL_POINTS);
-            glVertex3f(pixel(pointsX[i], DIM), pixel(pointsY[i], DIM), pixel(pointsZ[i], DIM));
-            glEnd();
-            glDisable(GL_POINT_SPRITE);
-            glEnable(GL_LIGHTING);
-        }
-    }
-}
 
 void ViewPort::paintGL()
 {
@@ -183,31 +179,27 @@ void ViewPort::paintGL()
     glEnd();
     glDisable(GL_POINT_SPRITE);
 
-//    if (merging)
-//    {
-//        float posIntrude[] = { intrude->x, intrude->y, intrude->z };
-//        float posNucleus[] = { nucleus->x, nucleus->y, nucleus->z };
+    if (merging)
+    {
+        float posIntrude[] = { intrude->x, intrude->y, intrude->z };
+        float posNucleus[] = { nucleus->x, nucleus->y, nucleus->z };
 
-//        glEnable(GL_LIGHT0);
-//        glLightModelfv(GL_LIGHT_MODEL_AMBIENT,black);
-//        glLightfv(GL_LIGHT0,GL_AMBIENT ,black);
-//        glLightfv(GL_LIGHT0,GL_DIFFUSE ,white);
-//        glLightfv(GL_LIGHT0,GL_SPECULAR,black);
-//        glLightfv(GL_LIGHT0,GL_POSITION,posIntrude);
+        glEnable(GL_LIGHT0);
+        glLightModelfv(GL_LIGHT_MODEL_AMBIENT,black);
+        glLightfv(GL_LIGHT0,GL_AMBIENT ,black);
+        glLightfv(GL_LIGHT0,GL_DIFFUSE ,white);
+        glLightfv(GL_LIGHT0,GL_SPECULAR,black);
+        glLightfv(GL_LIGHT0,GL_POSITION,posIntrude);
 
-//        glEnable(GL_LIGHT1);
-//        glLightfv(GL_LIGHT1, GL_AMBIENT, black);
-//        glLightfv(GL_LIGHT1, GL_DIFFUSE, white);
-//        glLightfv(GL_LIGHT0, GL_SPECULAR, black);
-//        glLightfv(GL_LIGHT1, GL_POSITION, posNucleus);
+        glEnable(GL_LIGHT1);
+        glLightfv(GL_LIGHT1, GL_AMBIENT, black);
+        glLightfv(GL_LIGHT1, GL_DIFFUSE, white);
+        glLightfv(GL_LIGHT0, GL_SPECULAR, black);
+        glLightfv(GL_LIGHT1, GL_POSITION, posNucleus);
+    }
 
-//        intrude->draw(t, nucleus, merging, dim);
-//        nucleus->draw(t, intrude, merging, dim);
-//        //explodePoints();
-//    }
-
-//    else
-//    {
+    else
+    {
         float posS2[]   = {s2->x, s2->y, s2->z, 1.0};
         float posS1[]   = {s1->x, s1->y, s1->z, 1.0};
         float posS3[]   = {s3->x, s3->y, s3->z, 1.0};
@@ -240,7 +232,10 @@ void ViewPort::paintGL()
         glLightfv(GL_LIGHT2, GL_DIFFUSE, white);
         glLightfv(GL_LIGHT2, GL_SPECULAR, black);
         glLightfv(GL_LIGHT2, GL_POSITION, posS3);
+    }
 
+    if(!merging)
+    {
         glDisable(GL_LIGHTING);
         glEnable(GL_POINT_SPRITE);
         glBegin(GL_POINTS);
@@ -252,30 +247,32 @@ void ViewPort::paintGL()
         glEnd();
         glDisable(GL_POINT_SPRITE);
         glEnable(GL_LIGHTING);
+    }
 
-        if(cubes)
+    if(cubes)
+    {
+        glColor3f(1,1,1);
+        for(char i = 1; i <= 6; ++i)
         {
-            glColor3f(1,1,1);
-            for(char i = 1; i <= 6; ++i)
-            {
-                glPushMatrix();
-                glRotated(i*20, 1,1,1);
-                cube(10*pow(-1,i),6/i,10*pow(-1,i), 0.5,0.5,0.5, 0);
-                glPopMatrix();
-            }
+            glPushMatrix();
+            glRotated(i*20, 1,1,1);
+            cube(10*pow(-1,i),6/i,10*pow(-1,i), 0.5,0.5,0.5, 0);
+            glPopMatrix();
         }
+    }
 
-        if(merging)
-        {
-            nucleus->draw(t, intrude, merging, dim);
-            intrude->draw(t, nucleus, merging, dim);
-            //std::cout << nucleus->x << "\n";
-        }
-        else { nucleus->draw(t, NULL, merging, dim); }
+    if(merging)
+    {
+        nucleus->draw(t, intrude, merging, dim);
+        intrude->draw(t, nucleus, merging, dim);
+    }
+    else
+    {
+        nucleus->draw(t, NULL, merging, dim);
         s1->paint(t, nucleus, dim, textures[0]);
         s2->paint(t, nucleus, dim, textures[1]);
         s3->paint(t, nucleus, dim, textures[2]);
-//    }
+    }
 
     glFlush();
 }

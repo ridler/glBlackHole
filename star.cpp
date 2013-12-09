@@ -7,11 +7,10 @@
 //float yellow[] = {1.0,1.0,0.0,1.0};
 //float Emission[]  = {0.0,0.0,0.01*EMISS,1.0};
 
-Star::Star(float x0, float y0, float z0, float v0x, float v0y, float v0z,
-           float r, double m)
+Star::Star(float pos[], float vel[], float r, double m)
 {
-    x = x0; y = y0; z = z0;
-    vx = v0x; vy = v0y; vz = v0z;
+    x = pos[0]; y = pos[1]; z = pos[2];
+    vx = vel[0]; vy = vel[1]; vz = vel[2];
     R = r; mass = m;
     exists = true;
 }
