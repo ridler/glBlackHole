@@ -8,6 +8,8 @@ The project can be compiled and run using the "Run" button on Qt Creator.  qmake
 
 The interaction is intuitive: you can move the viewing angles by clicking and dragging in the display area, and you can switch modes by clicking the buttons on the right side of the main window.  Zooming is accomplished by scrolling.  I do not recommend trying to change the viewing angles or zooming while in the object riding mode.
 
+When in merging mode, the action may take a few seconds to start, so be patient.
+
 The most fun mode is the mode called "ride an object."  You can ride the red star or the lower-mass merging black hole in each respective mode.
 
 ## Notes
