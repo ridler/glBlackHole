@@ -2,11 +2,6 @@
 #include "helperFunctions.h"
 #include <iostream>
 
-//const float EMISS = 16;
-//float shinyvec[1];    // Shininess (value)
-//float yellow[] = {1.0,1.0,0.0,1.0};
-//float Emission[]  = {0.0,0.0,0.01*EMISS,1.0};
-
 Star::Star(float pos[], float vel[], float r, double m)
 {
     x = pos[0]; y = pos[1]; z = pos[2];
@@ -24,9 +19,6 @@ void Star::paint(float t, BlackHole* bh, unsigned short dim, unsigned int texT)
 
     // Newtonian force calculations:
     double M = bh->mass;
-
-    //std::cout << "M = " << M << "\t" << "R = " << eh << "\n";
-
     double denom = pow(x*x + y*y + z*z, 1.5);
     double ax = -G*M*(x)/denom;
     double ay = -G*M*(y)/denom;
@@ -36,6 +28,7 @@ void Star::paint(float t, BlackHole* bh, unsigned short dim, unsigned int texT)
     vy += ay*t;
     vz += az*t;
 
+    // Limit velocity to the speed of light
     vx > 3e8 ? vx = 3e8 : vx = vx;
     vy > 3e8 ? vy = 3e8 : vy = vy;
     vz > 3e8 ? vz = 3e8 : vz = vz;

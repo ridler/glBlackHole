@@ -26,6 +26,7 @@ private:
     double fov;       //  field of view
     bool merging;     //  switches modes
     bool cubes;       //  toggle cubes
+    bool rideS;        //  ride mode
     unsigned int textures[nTex];
     void genTex();
     void project();
@@ -39,7 +40,8 @@ public:
 public slots:
     void reset(void);           // Reset view
     void beginMerge(void);      // Switch modes
-    void toggleCubes(void);
+    void toggleCubes(void);     // Toggle Cube display
+    void ride(void);            // toggle ride mode
 
 private slots:
     void animate();

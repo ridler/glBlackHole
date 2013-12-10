@@ -47,9 +47,6 @@ void BlackHole::draw(float t, BlackHole* bh, bool mergeMode, unsigned short int 
         float ry = bh->y - this->y;
         float rz = bh->z - this->z;
 
-//        if(rx <= bh->R && ry <= bh->R && rz <= bh->R)
-//        { return; }
-
         float M = bh->mass;
 
         double denom = pow(rx*rx + ry*ry + rz*rz, 1.5);
@@ -61,6 +58,7 @@ void BlackHole::draw(float t, BlackHole* bh, bool mergeMode, unsigned short int 
         this->vy += ay*t;
         this->vz += az*t;
 
+        // Limit velocities to speed of light
         vx > 3e8 ? vx = 3e8 : vx = vx;
         vy > 3e8 ? vy = 3e8 : vy = vy;
         vz > 3e8 ? vz = 3e8 : vz = vz;

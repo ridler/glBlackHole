@@ -20,7 +20,7 @@ float s2_vel[] = { 9.4e7, 0, 0 };
 
 float s3R = 8.1e7; float s3M = 3e30;
 float s3_pos[] = { -7e10, 3e8, 0 };
-float s3_vel[] = { 2e6, 3e5, 9e7 };
+float s3_vel[] = { 2e4, 7e7, -4e7 };
 
 Star* s1 = new Star(s1_pos, s1_vel, s1R, s1M);
 Star* s2 = new Star(s2_pos, s2_vel, s2R, s2M);
@@ -29,9 +29,9 @@ Star* s3 = new Star(s3_pos, s3_vel, s3R, s3M);
 float nucleus_pos[] = { 0, 0, 0 };
 float nucleusR = 6.7e9; float nucleusM = 8.2e36;
 
-float intrude_pos[] = { 4e11, 3e4, -2e5 };
-float intrude_vel[] = { -2e4, -3e3, -2e7 };
-float intrudeR = 4.6e9; float intrudeM = 5.9e35;
+float intrude_pos[] = { 4e11, 3e5, 0 };
+float intrude_vel[] = { -2e4, -3e4, -2e7 };
+float intrudeR = 4.6e9; float intrudeM = 1.3e36;
 
 BlackHole* nucleus = new BlackHole(nucleus_pos, nucleusR, nucleusM);
 BlackHole* intrude = new BlackHole(intrude_pos, intrude_vel, intrudeR, intrudeM);
@@ -52,6 +52,7 @@ ViewPort::ViewPort(QWidget* parent)
     dim = 10;
     merging = false;
     cubes = true;
+    rideS = false;
     DIM = dim;
 
     animationTimer.setSingleShot(false);
@@ -74,7 +75,6 @@ void ViewPort::initializeGL()
         pointsX[i] = radius*cos(theta);
         pointsZ[i] = radius*sin(theta);
         pointsY[i] = -nucleus->R/4 + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(nucleus->R/4+nucleus->R/4)));
-        //cout << x << " " << y << endl;
     }
 
     for (unsigned short int i = 0; i < nCloudPs; ++i)
@@ -88,7 +88,7 @@ void ViewPort::initializeGL()
 void ViewPort::resizeGL(int width, int height)
 {
     asp = (width && height) ? width / (float)height : 1;
-    //  Viewport is whole screen
+    // Not to be confused with this class
     glViewport(0,0,width,height);
     project();
 }
@@ -115,6 +115,7 @@ void ViewPort::reset(void)
     th = ph = 15; fov = 80;
     t = 0; elapsed = 0;
     merging = false;
+    rideS = false;
 
     s1->x = s1_pos[0]; s1->y = s1_pos[1]; s1->z = s1_pos[2];
     s2->x = s2_pos[0]; s2->y = s2_pos[1]; s2->z = s2_pos[2];
@@ -133,10 +134,14 @@ void ViewPort::reset(void)
     updateGL();
 }
 
+void ViewPort::ride() { rideS = !rideS; }
+
 void ViewPort::beginMerge()
 {
     merging = true; cubes = false;
-    fov -= 25;
+    t = 20;
+    fov += 50;
+    th = ph = 10;
     inc = 0.001;
     updateGL();
 }
@@ -148,10 +153,28 @@ void ViewPort::paintGL()
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
 
-    float Ex = -2*dim*Sin(th)*Cos(ph);
-    float Ey = +2*dim        *Sin(ph);
-    float Ez = +2*dim*Cos(th)*Cos(ph);
-    gluLookAt(Ex,Ey,Ez, 0,0,0, 0,Cos(ph),0);
+    float Ex, Ey, Ez;
+    Ex = -2*dim*Sin(th)*Cos(ph);
+    Ey = +2*dim        *Sin(ph);
+    Ez = +2*dim*Cos(th)*Cos(ph);
+    if (merging && rideS)
+    {
+        float lx = pixel(nucleus->x, dim);
+        float ly = pixel(nucleus->y, dim);
+        float lz = pixel(nucleus->z, dim);
+        Ex = pixel(intrude->x, dim);
+        Ey = pixel(intrude->y, dim);
+        Ez = pixel(intrude->z, dim);
+        gluLookAt(Ex,Ey,Ez, lx,ly,lz, 0,Cos(ph),0);
+    }
+    else if (!merging && rideS)
+    {
+        Ex = pixel(s1->x, dim);
+        Ey = pixel(s1->y, dim);
+        Ez = pixel(s1->z, dim);
+        gluLookAt(Ex,Ey,Ez, 0,0,0, 0,Cos(ph),0);
+    }
+    else { gluLookAt(Ex,Ey,Ez, 0,0,0, 0,Cos(ph),0); }
 
     for (unsigned char i = 0; i < nTex; ++i)
     { glBindTexture(GL_TEXTURE_2D, textures[i]); }

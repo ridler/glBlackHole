@@ -5,7 +5,8 @@
 #endif
 #include "helpers.h"
 
-void billboardBegin() {
+void billboardBegin()
+{
 
     float modelview[16];
     int i,j;
@@ -30,7 +31,7 @@ void billboardBegin() {
     glLoadMatrixf(modelview);
 }
 
-
+// converts "world" coordinates into screen coordinates
 float pixel(float wx, unsigned short int dim)
 {
     int pmin = -dim; int pmax = dim;
@@ -39,6 +40,7 @@ float pixel(float wx, unsigned short int dim)
     return result;
 }
 
+// For Drawing Spheres
 void Vertex(double th,double ph)
 {
     double x = Sin(th)*Cos(ph);
