@@ -52,6 +52,8 @@ void Star::paint(float t, BlackHole* bh, unsigned short dim, unsigned int texT)
     glEnable(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D,texT);
     glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_ONE, GL_ONE);
 
     billboardBegin();
     glBegin(GL_QUADS);
@@ -62,6 +64,7 @@ void Star::paint(float t, BlackHole* bh, unsigned short dim, unsigned int texT)
     glEnd();
     glPopMatrix();
 
+    glDisable(GL_BLEND);
     glDisable(GL_TEXTURE_2D);
     glEnable(GL_LIGHTING);
 

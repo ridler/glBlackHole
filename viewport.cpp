@@ -138,6 +138,7 @@ void ViewPort::ride() { rideS = !rideS; }
 
 void ViewPort::beginMerge()
 {
+    t = 0; elapsed = 0;
     merging = true; cubes = false;
     t = 20;
     fov += 50;
